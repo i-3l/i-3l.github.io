@@ -1,0 +1,380 @@
+:root {
+  --i3l-orange: #C45B28;
+  --i3l-orange-dark: #A64A1E;
+  --text-muted: #4a4a4a;
+}
+
+body {
+  font-family: 'Google Sans', 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.rows {
+  margin-top: 2rem;
+}
+
+.rows + .rows {
+  margin-top: 2.5rem;
+}
+
+.hero + .rows {
+  margin-top: 1rem;
+}
+
+.rows .title {
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.hero .hero-body {
+  padding-bottom: 1.5rem;
+}
+
+h1.title.publication-title {
+  font-family: 'Google Sans', sans-serif;
+  color: var(--i3l-orange);
+  font-size: 2.6rem;
+  line-height: 1.2;
+}
+
+.publication-subtitle {
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: #363636;
+  margin-top: -0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.publication-authors {
+  font-family: 'Google Sans', sans-serif;
+}
+
+.publication-authors a {
+  color: #000000 !important;
+}
+
+.publication-authors a:hover {
+  text-decoration: underline;
+  color: #414141 !important;
+}
+
+.author-block {
+  display: inline-block;
+}
+
+.affiliation {
+  display: inline-block;
+  color: #2c2c2c;
+  padding-top: 0.6em;
+  text-align: center;
+}
+
+.author-notes {
+  color: #828282;
+}
+
+.conference-notice {
+  color: var(--i3l-orange);
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.button-container {
+  color: #53565A;
+  justify-items: center;
+  padding-top: 0.5em;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+.button {
+  color: #53565A;
+  font-family: 'Google Sans', sans-serif;
+  border-radius: 0.5em;
+  min-width: 6em;
+  width: auto;
+  padding: 0.4em 1em;
+  height: auto;
+  min-height: 2.2em;
+  margin: 0 0.4em;
+  text-align: center;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1em;
+  vertical-align: middle;
+  border: solid 0px transparent;
+  background-color: #f2f2f2;
+  white-space: nowrap;
+}
+
+.button:hover {
+  background-color: #f2f2f2;
+  filter: brightness(97%);
+}
+
+.button.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-icon svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+
+@media screen and (max-width: 600px) {
+  .button-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6em;
+  }
+  .button {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    max-width: 280px;
+    white-space: normal;
+  }
+  h1.title.publication-title {
+    font-size: 2rem;
+  }
+}
+
+.teaser-image {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 0.9rem;
+}
+
+.teaser-caption {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-muted);
+  max-width: 820px;
+  margin: 0 auto 2rem;
+  line-height: 1.5;
+}
+
+.publication-video {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+  overflow: hidden;
+  border-radius: 10px !important;
+  background: #111;
+}
+
+.publication-video iframe,
+.publication-video video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ddd;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.video-placeholder i {
+  font-size: 2.5rem;
+  color: var(--i3l-orange);
+}
+
+.method-image {
+  padding: 0;
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+.figure-caption {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 860px;
+  margin: 0.75rem auto 0;
+  line-height: 1.5;
+}
+
+.figure-caption strong {
+  color: #363636;
+}
+
+.subsection-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem;
+  color: #363636;
+}
+
+.rows .content p {
+  line-height: 1.65;
+}
+
+.contribution-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.contribution-card {
+  background: #fafafa;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+}
+
+.contribution-card h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--i3l-orange);
+  margin-bottom: 0.4rem;
+}
+
+.contribution-card p {
+  font-size: 0.93rem;
+  color: #444;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .contribution-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.25rem 0 1.5rem;
+}
+
+.stat-tile {
+  flex: 1 1 180px;
+  max-width: 220px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  padding: 1rem 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.stat-value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--i3l-orange);
+  line-height: 1.1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 0.35rem;
+  line-height: 1.35;
+}
+
+.results-table-wrapper {
+  overflow-x: auto;
+  margin: 0 auto 1rem;
+}
+
+table.results-table {
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+  min-width: 520px;
+}
+
+table.results-table th,
+table.results-table td {
+  padding: 0.45rem 0.9rem;
+  border-bottom: 1px solid #e6e6e6;
+  text-align: right;
+  white-space: nowrap;
+}
+
+table.results-table th:first-child,
+table.results-table td:first-child {
+  text-align: left;
+}
+
+table.results-table thead th {
+  border-bottom: 2px solid #363636;
+  font-weight: 600;
+}
+
+table.results-table .group-row td {
+  font-style: italic;
+  color: #666;
+  border-bottom: none;
+  padding-top: 0.7rem;
+}
+
+table.results-table td.best {
+  font-weight: 700;
+  color: var(--i3l-orange);
+}
+
+table.results-table th.ours {
+  color: var(--i3l-orange);
+}
+
+.bibtex {
+  font-family: "Courier", monospace;
+  font-size: 0.8em;
+  color: #2f2f2f;
+  background-color: #f2f2f2;
+  border-radius: 10px;
+  margin-top: 0.6em;
+  margin-bottom: 3em;
+  padding: 0.8em 1em;
+  white-space: pre;
+  overflow-x: auto;
+  line-height: 1.4;
+}
+
+.footer {
+  background: #fafafa;
+  padding: 2rem 1.5rem;
+}
+
+.footer .content {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.footer a {
+  color: var(--i3l-orange);
+}
+
+body {
+  padding-bottom: 4rem;
+}

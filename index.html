@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="I3L: Iterative Interactive Imitation Learning for Whole-Body Mobile Manipulation">
+  <meta name="keywords" content="I3L, JoyLo+, Interactive Imitation Learning, Mobile Manipulation, Whole-Body Control, HG-DAgger, BEHAVIOR">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I3L: Iterative Interactive Imitation Learning for Whole-Body Mobile Manipulation</title>
+
+  <meta property="og:title" content="I3L: Iterative Interactive Imitation Learning for Whole-Body Mobile Manipulation">
+  <meta property="og:description" content="An integrated hardware and learning system that couples targeted whole-body correction with iterative policy refinement.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="static/images/teaser.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="I3L: Iterative Interactive Imitation Learning for Whole-Body Mobile Manipulation">
+  <meta name="twitter:image" content="static/images/teaser.jpg">
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">I3L: Iterative Interactive Imitation Learning for Whole-Body Mobile Manipulation</h1>
+
+
+          <div class="button-container">
+            <a href="static/paper.pdf" target="_blank" class="button"><i class="fa fa-file-alt"></i>&emsp14;Paper</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <img class="teaser-image" src="./static/images/teaser.jpg"
+         alt="I3L overview: operator takes over with JoyLo+, corrections are aggregated for retraining, and representative tasks and embodiments.">
+    <p class="teaser-caption">
+      <strong>I3L couples interactive correction with iterative policy refinement.</strong>
+      Left: 1) the policy approaches a failure, prompting the operator to take over with JoyLo+ and provide targeted corrections, 2) the operator uses JoyLo+ to take over during autonomous execution.
+      Center: corrections are aggregated with prior demonstrations for policy retraining and redeployment.
+      Right: representative tasks and embodiments.
+    </p>
+
+    <h2 class="title is-3 has-text-centered">Abstract</h2>
+    <div class="content has-text-justified">
+      <p>
+        Policies trained offline from teleoperated demonstrations can degrade outside their training distribution.
+        This gap is particularly acute in long-horizon whole-body mobile manipulation, where long horizons amplify
+        compounding errors and coordinated arm, torso, and base motion makes exhaustive demonstration coverage impractical.
+        We introduce I3L, an integrated hardware and learning system that couples targeted whole-body correction with
+        iterative policy refinement to address this last-mile reliability gap. Its low-cost, open-source JoyLo+ interface
+        uses policy-tracking leader arms and touch-triggered takeover to enable coordinated corrections across the arms,
+        torso, and mobile base, while repeated deployment and retraining allow operators to target failures of the updated
+        policy. We evaluate I3L across three robot embodiments and eight simulated and real-world tasks, including four
+        long-horizon whole-body mobile manipulation tasks. Controlled simulation comparisons show that four-round HG-DAgger
+        achieves the highest final success on both simulation tasks. Under this protocol, I3L improves autonomous success
+        over the base policies by an average of 68.3 percentage points and achieves at least 90% success on every task,
+        outperforming demonstration-only training by 35.6 percentage points on average under matched training-trajectory
+        budgets. Across four rounds, task-averaged takeover duration per episode decreases by 72%. Together, these results
+        show that I3L helps close the last-mile gap between offline training and reliable deployment and provides practical
+        insights into collecting and using corrections for long-horizon whole-body mobile manipulation.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Walkthrough Video</h2>
+    <div class="publication-video">
+      <!-- TODO: replace with the real video, e.g.
+           <video controls playsinline muted preload="none"><source src="./static/videos/overview.mp4" type="video/mp4"></video>
+           or a YouTube embed: <iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID" allowfullscreen></iframe> -->
+      <div class="video-placeholder">
+        <i class="fa fa-play-circle"></i>
+        <span>Video coming soon</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">JoyLo+: A Hardware Interface for Policy Intervention</h2>
+    <img class="method-image" src="./static/images/hardware.jpeg" alt="JoyLo+ correction interface in single-arm (Franka) and dual-arm (R1 Pro) configurations.">
+    <p class="figure-caption">
+      <strong>JoyLo+ correction interface.</strong> Motorized arm leaders track policy targets during autonomous execution
+      and switch to compliant current control during global takeover. Capacitive touch sensors trigger takeover, while
+      JoyCon inputs control the torso, mobile base, and grippers. The interface supports single-arm and dual-arm configurations.
+    </p>
+    <div class="content has-text-justified" style="margin-top: 1.25rem;">
+      <p>
+        JoyLo+ is an actuated interface for human intervention during autonomous policy execution. We implement two
+        configurations: <strong>R1 Pro JoyLo+</strong>, with two seven-joint leaders for bimanual whole-body mobile
+        manipulation, and <strong>Franka JoyLo+</strong>, with one seven-joint leader for single-arm manipulation.
+        Building on GELLO's kinematic leaders and JoyLo's actuated interface, both configurations combine policy-target
+        tracking, capacitive-touch detection, and compliant hand guidance.
+      </p>
+      <p>
+        <strong>Actuated leaders for tracking and correction.</strong> During autonomy, the actuated leaders track the
+        policy's arm joint targets, physically displaying the commanded configuration on the device used for correction.
+        During intervention, gravity compensation supports the leaders while the operator guides their motion.
+      </p>
+      <p>
+        <strong>Grip-integrated sensing for direct takeover.</strong> Conductive copper electrodes in the gripping surfaces,
+        read by an MPR121 capacitive-sensing board, let the operator request control simply by grasping the interface,
+        without first displacing a tracking leader. On takeover, the interface changes from policy tracking to
+        gravity-compensated hand guidance.
+      </p>
+      <p>
+        <strong>Whole-body intervention.</strong> On R1 Pro, touching a grip or providing a JoyCon input transfers command
+        of both arms, the torso, the base, and the grippers together. Releasing the interface returns control to the policy,
+        which replans from the corrected state as the leaders resume tracking.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Iterative Interactive Imitation Learning</h2>
+    <div class="content has-text-justified">
+      <p>
+        Starting from a demonstration dataset <em>D<sub>0</sub></em>, each round deploys the previous policy and collects a
+        labeled rollout dataset through JoyLo+. Under HG-DAgger filtering, only the original demonstrations and the
+        <strong>active intervention frames</strong> from all rounds are retained for training. Pre-intervention and
+        on-policy frames are excluded to concentrate training on human demonstrations and corrective supervision.
+      </p>
+      <p>
+        Each round trains from the same starting weights rather than continuing from the previous round's policy: the
+        same pretrained checkpoint for the π<sub>0.5</sub>-based VLA, and the same initialization for diffusion policies.
+        As earlier failures become less frequent, corrections naturally shift toward downstream stages such as transport
+        and placement, producing an <strong>emergent failure-mode curriculum</strong>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Tasks and Embodiments</h2>
+    <img class="method-image" src="./static/images/tasks.jpeg" alt="Eight evaluation tasks across A1, Franka, and R1 Pro in simulation and the real world.">
+    <p class="figure-caption">
+      <strong>Evaluation tasks and initialization randomization.</strong> Representative images show initial configurations
+      and successful task outcomes. The eight tasks span 29 annotated subtasks (2–6 per task). Across the four real-world
+      R1 Pro tasks, task executions average approximately 83 seconds, with book storage and breakfast preparation averaging
+      close to two minutes each. Yellow mats indicate the R1 Pro base initialization regions as well as where some
+      task-relevant objects are randomized before each episode.
+    </p>
+    <div class="content has-text-justified" style="margin-top: 1.25rem;">
+      <p>
+        We evaluate on eight tasks across three robots. <strong>Controlled simulation (A1, R1 Pro):</strong>
+        Pick-and-Place Strawberries and Open Fridge and Pick Up Radio in BEHAVIOR, used for collection-schedule and
+        learning-strategy comparisons. <strong>Fixed-base manipulation (Franka):</strong> peg insertion and mug hanging,
+        precision-oriented contact-rich tasks using the single-arm JoyLo+. <strong>Whole-body mobile manipulation
+        (R1 Pro):</strong> four long-horizon real-world BEHAVIOR tasks: Prepare Make-Ahead Breakfast Bowls, Boxing Books
+        for Storage, Make Microwave Popcorn, and Turning on Radio.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Targeted Corrections Beat Additional Demonstrations</h2>
+
+    <div class="stat-row">
+      <div class="stat-tile">
+        <div class="stat-value">+68.3</div>
+        <div class="stat-label">points over base policy<br>(avg. across 8 tasks)</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value">+35.6</div>
+        <div class="stat-label">points over +100 demos<br>(matched trajectory budget)</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value">≥90%</div>
+        <div class="stat-label">autonomous success<br>on every task</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value">−72%</div>
+        <div class="stat-label">takeover time per episode<br>from Round 1 to Round 4</div>
+      </div>
+    </div>
+
+    <div class="results-table-wrapper">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Base</th>
+            <th>100 demos</th>
+            <th class="ours">100 corrections (ours)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-row"><td colspan="4">Simulation</td></tr>
+          <tr><td>Pick-and-Place Strawberries</td><td>53.2%</td><td>55.6%</td><td class="best">92.8%</td></tr>
+          <tr><td>Open Fridge and Pick Up Radio</td><td>39.6%</td><td>30.4%</td><td class="best">90.0%</td></tr>
+          <tr class="group-row"><td colspan="4">Real world (Franka)</td></tr>
+          <tr><td>Mug Hanging</td><td>6/25 (24%)</td><td>17/25 (68%)</td><td class="best">23/25 (92%)</td></tr>
+          <tr><td>Peg Insertion</td><td>7/25 (28%)</td><td>12/25 (48%)</td><td class="best">23/25 (92%)</td></tr>
+          <tr class="group-row"><td colspan="4">Real world (R1 Pro)</td></tr>
+          <tr><td>Prepare Make-Ahead Breakfast Bowls</td><td>1/25 (4%)</td><td>19/25 (76%)</td><td class="best">24/25 (96%)</td></tr>
+          <tr><td>Boxing Books up for Storage</td><td>3/25 (12%)</td><td>13/25 (52%)</td><td class="best">23/25 (92%)</td></tr>
+          <tr><td>Make Microwave Popcorn</td><td>5/25 (20%)</td><td>20/25 (80%)</td><td class="best">25/25 (100%)</td></tr>
+          <tr><td>Turning on Radio</td><td>6/25 (24%)</td><td>14/25 (56%)</td><td class="best">24/25 (96%)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="figure-caption">
+      <strong>Autonomous full-task success before and after additional data collection.</strong> Base policies receive
+      100 additional demonstrations or 100 corrective trajectories through four HG-DAgger rounds.
+    </p>
+    <div class="content has-text-justified" style="margin-top: 1.25rem;">
+      <p>
+        Additional demonstrations improve base-policy success by 32.7 percentage points on average across the eight tasks,
+        while four-round HG-DAgger improves it by 68.3 points, a 35.6-point advantage over collecting 100 additional
+        demonstrations. Four-round HG-DAgger outperforms both baselines on every task,
+        reaching at least 90% success throughout. On the four long-horizon real-world BEHAVIOR tasks, corrections provide an
+        average advantage of 30 percentage points over additional demonstrations.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Iteration Reduces Intervention Burden</h2>
+    <img class="method-image" src="./static/images/intervention_trends.png" alt="Intervention burden and task completion across correction rounds.">
+    <p class="figure-caption">
+      <strong>Intervention burden and task completion across correction rounds.</strong> In (a–c), the dark line shows the
+      equal-weight mean across eight tasks; (b) measures the fraction of execution under intervention, and (c) measures
+      time under intervention per episode. In (d), rounds 1–4 show takeover-free collection episodes. The final bar and dashed
+      demo-only baseline (58.3%) compare autonomous evaluation success under matched training-trajectory budgets.
+    </p>
+    <div class="content has-text-justified" style="margin-top: 1.25rem;">
+      <p>
+        From Round 1 to Round 4, the mean number of takeovers per episode decreases by 63.4%, the mean fraction of frames
+        under intervention decreases by 69.5%, and the mean total takeover duration per episode decreases by 72.0%.
+        All three task-averaged measures decline in every round, while the final policies achieve at least 90% autonomous
+        success on every task.
+      </p>
+    </div>
+
+    <h3 class="subsection-heading has-text-centered">Remaining bottlenecks are task dependent</h3>
+    <img class="method-image" src="./static/images/correction.png" alt="Task-stage intervention patterns across correction rounds.">
+    <p class="figure-caption">
+      <strong>Task-stage intervention patterns across correction rounds.</strong> Orange curves show intervention rate over
+      normalized episode progress; color and line style distinguish Rounds 1–4. Red annotations indicate failures and green
+      annotations indicate successful behaviors. On Books, intervention around book pickup decreases substantially by
+      Round 4, while a peak remains around basket pickup. On Breakfast Bowls, intervention during drawer opening and bread
+      placement diminishes, while late-stage intervention remains around bowl placement.
+    </p>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Corrections Span the Whole Body</h2>
+    <div class="columns is-vcentered">
+      <div class="column is-half">
+        <img class="method-image" src="./static/images/whole_body_takeover.png" alt="Body-part activation shares during JoyLo+ corrections.">
+        <p class="figure-caption">
+          <strong>Body-part activation shares during JoyLo+ corrections.</strong> Bars pool four 25-episode rounds; each
+          part receives one vote per takeover segment after three consecutive active frames.
+        </p>
+      </div>
+      <div class="column is-half">
+        <div class="content has-text-justified">
+          <p>
+            The motorized bilateral leaders control both arms, while the JoyCon controls the torso and base, allowing a single
+            global takeover to coordinate several parts of the R1 Pro simultaneously.
+          </p>
+          <p>
+            Operators use JoyLo+ to correct more than arm motion: base activations account for an average of
+            <strong>34.2%</strong> of body-part votes across all four real-world tasks, while torso activations contribute
+            an average of <strong>8.2%</strong> in the three tasks where they occur. Arm usage varies by task, with comparable
+            left and right arm shares in Books and Breakfast but larger left-arm shares in Radio and Popcorn.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Operator Study</h2>
+    <div class="columns is-vcentered">
+      <div class="column is-half">
+        <img class="method-image" src="./static/images/operator_study.png" alt="Operator study on Franka mug hanging across three teleoperators.">
+        <p class="figure-caption">
+          <strong>Operator study on Franka mug hanging.</strong> (a) Cumulative fraction of timesteps under human control.
+          (b) Cumulative takeover-free episode counts.
+        </p>
+      </div>
+      <div class="column is-half">
+        <div class="content has-text-justified">
+          <p>
+            We examine policy improvement and intervention burden across three teleoperators with varying levels of
+            experience on Franka Mug Hanging. Each operator collects 25 episodes per round over three correction rounds,
+            totaling 225 episodes.
+          </p>
+          <p>
+            Cumulative intervention share decreases for all three operators, from 16.1% to 11.8%, 34.6% to 19.9%, and
+            16.4% to 14.7%. By Round 3, takeover-free episodes account for 40–55% of each operator's cumulative collection,
+            suggesting that I3L enables iterative refinement with declining intervention burden across users with varied
+            teleoperation experience.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Which Correction-Learning Strategy?</h2>
+    <div class="results-table-wrapper">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Setting</th>
+            <th>Residual</th>
+            <th>BC (all data)</th>
+            <th>SIRIUS</th>
+            <th class="ours">HG-DAgger</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-row"><td colspan="5">Open Fridge and Pick Up Radio</td></tr>
+          <tr><td>Single round (100)</td><td>21.6</td><td>79.2</td><td>73.2</td><td>80.0</td></tr>
+          <tr><td>Round 1 (25)</td><td>16.0</td><td>70.8</td><td>54.8</td><td>51.6</td></tr>
+          <tr><td>Round 2 (50)</td><td>24.0</td><td>86.4</td><td>68.4</td><td>72.4</td></tr>
+          <tr><td>Round 3 (75)</td><td>30.0</td><td>87.2</td><td>70.4</td><td>82.0</td></tr>
+          <tr><td>Round 4 (100)</td><td>19.6</td><td>88.0</td><td>71.6</td><td class="best">90.0</td></tr>
+          <tr class="group-row"><td colspan="5">Pick-and-Place Strawberries</td></tr>
+          <tr><td>Single round (100)</td><td>45.2</td><td>14.8</td><td>76.0</td><td>89.2</td></tr>
+          <tr><td>Round 1 (25)</td><td>49.2</td><td>0.4</td><td>70.8</td><td>75.6</td></tr>
+          <tr><td>Round 2 (50)</td><td>45.6</td><td>1.2</td><td>78.8</td><td>88.4</td></tr>
+          <tr><td>Round 3 (75)</td><td>40.0</td><td>4.4</td><td>37.6</td><td>88.4</td></tr>
+          <tr><td>Round 4 (100)</td><td>46.8</td><td>10.8</td><td>78.8</td><td class="best">92.8</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="figure-caption">
+      <strong>Correction-learning comparison in simulation.</strong> Entries report full-task success rates (%), averaged over five evaluation seeds. Numbers
+      in parentheses indicate cumulative corrective trajectories. The best result for each task is highlighted.
+    </p>
+    <div class="content has-text-justified" style="margin-top: 1.25rem;">
+      <p>
+        Four-round HG-DAgger achieves the highest final success on both simulation tasks. BC (all data) leads at
+        intermediate rounds and finishes close to HG-DAgger on Open Fridge, but performs poorly on Strawberries throughout.
+        SIRIUS improves steadily on Open Fridge, while its Strawberries performance drops sharply at Round 3 before
+        recovering. Residual learning shows little final benefit from iteration on either task. Additional correction rounds
+        alone do not guarantee better policies: the benefit of iterative collection depends on the learning strategy used to
+        incorporate the resulting data.
+      </p>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
