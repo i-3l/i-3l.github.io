@@ -11,11 +11,16 @@
   <meta property="og:title" content="I3L: Iterative Interactive Imitation Learning for Whole-Body Mobile Manipulation">
   <meta property="og:description" content="An integrated hardware and learning system that couples targeted whole-body correction with iterative policy refinement.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="static/images/teaser.jpg">
+  <meta property="og:url" content="https://i-3l.github.io/">
+  <meta property="og:image" content="https://i-3l.github.io/static/images/teaser.jpg">
+  <meta property="og:image:width" content="2748">
+  <meta property="og:image:height" content="1021">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="I3L: Iterative Interactive Imitation Learning for Whole-Body Mobile Manipulation">
-  <meta name="twitter:image" content="static/images/teaser.jpg">
+  <meta name="twitter:description" content="An integrated hardware and learning system that couples targeted whole-body correction with iterative policy refinement.">
+  <meta name="twitter:image" content="https://i-3l.github.io/static/images/teaser.jpg">
 
+  <link rel="canonical" href="https://i-3l.github.io/">
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
@@ -125,6 +130,40 @@
         which replans from the corrected state as the leaders resume tracking.
       </p>
     </div>
+
+    <h3 class="subsection-heading has-text-centered">Bill of Materials</h3>
+    <div class="results-table-wrapper">
+      <table class="results-table bom-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Qty.</th>
+            <th>Unit</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>XM430-W350-T servo</td><td>4</td><td>$220</td><td>$880</td></tr>
+          <tr><td>XC330-M288-T servo</td><td>3</td><td>$50</td><td>$150</td></tr>
+          <tr><td>U2D2 USB adapter</td><td>2</td><td>$30</td><td>$60</td></tr>
+          <tr><td>Power supply (12&thinsp;V / 5&thinsp;V)</td><td>2</td><td>$25</td><td>$50</td></tr>
+          <tr><td>3D-printed links (set)</td><td>1</td><td>$15</td><td>$15</td></tr>
+          <tr><td>JoyCon pair (L+R)</td><td>1</td><td>$80</td><td>$80</td></tr>
+          <tr><td><a href="https://www.adafruit.com/product/1982" target="_blank" rel="noopener">Adafruit MPR121 touch sensor</a></td><td>1</td><td>$7.95</td><td>$7.95</td></tr>
+          <tr><td><a href="https://lilygo.cc/products/t-display-s3" target="_blank" rel="noopener">LILYGO T-Display S3</a></td><td>1</td><td>$9.54</td><td>$9.54</td></tr>
+          <tr><td>Conductive copper tape</td><td>1</td><td>$5</td><td>$5</td></tr>
+          <tr class="total-row"><td>Listed-component subtotal</td><td></td><td></td><td>$1,257.49</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="figure-caption">
+      <strong>JoyLo+ component cost estimate (USD).</strong> One R1&nbsp;Pro leader motor/link assembly plus the listed
+      accessories. Each R1&nbsp;Pro leader uses four proximal XM430 and three distal XC330 servos; the Franka leader uses
+      three XM430 and four XC330 servos of the same models. Sensor and microcontroller prices are retail estimates and the
+      copper-tape cost was supplied by the authors, so this is a listed-component subtotal rather than a complete per-arm or
+      bimanual-system price: the quantities above include a single MPR121 board and microcontroller, whose allocation across
+      two leaders is not broken out. The deployed robot, tax, and shipping are excluded.
+    </p>
   </div>
 </div>
 

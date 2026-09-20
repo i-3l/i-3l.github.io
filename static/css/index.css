@@ -378,3 +378,26 @@ table.results-table th.ours {
 body {
   padding-bottom: 4rem;
 }
+
+table.results-table .total-row td {
+  border-top: 1px solid #363636;
+  border-bottom: none;
+  font-weight: 700;
+  padding-top: 0.55rem;
+}
+
+table.results-table .total-row td:last-child {
+  color: var(--i3l-orange);
+}
+
+table.results-table td a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: #c9c9c9;
+  text-underline-offset: 2px;
+}
+
+table.results-table td a:hover {
+  color: var(--i3l-orange);
+  text-decoration-color: var(--i3l-orange);
+}
