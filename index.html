@@ -25,7 +25,12 @@
   <link rel="stylesheet" href="./static/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="stylesheet" href="./static/css/interactive-figures.css">
+  <link rel="stylesheet" href="./static/css/hardware-viewer.css">
   <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script defer src="./static/js/figure-config.js"></script>
+  <script defer src="./static/js/interactive-figures.js"></script>
+  <script defer src="./static/js/hardware-viewer.js"></script>
 </head>
 <body>
 
@@ -39,6 +44,7 @@
 
           <div class="button-container">
             <a href="static/paper.pdf" target="_blank" class="button"><i class="fa fa-file-alt"></i>&emsp14;Paper</a>
+            <a href="#hardware" class="button">Explore hardware&nbsp;↓</a>
           </div>
         </div>
       </div>
@@ -98,7 +104,51 @@
 
 <div class="rows">
   <div class="container is-max-desktop">
-    <h2 class="title is-3">JoyLo+: A Hardware Interface for Policy Intervention</h2>
+    <h2 id="hardware" class="title is-3">JoyLo+: A Hardware Interface for Policy Intervention</h2>
+    <div class="hardware-viewer" id="hardware-viewer" aria-labelledby="hardware-viewer-title" data-state="idle">
+      <div class="hardware-header">
+        <div>
+          <p class="hardware-eyebrow">Inside JoyLo+</p>
+          <h3 id="hardware-viewer-title">Explore the device</h3>
+        </div>
+        <div class="hardware-models" role="group" aria-label="Leader configuration" hidden>
+          <button type="button" data-model="r1pro" aria-pressed="true">R1 Pro leader</button>
+          <button type="button" data-model="franka" aria-pressed="false">Franka leader</button>
+        </div>
+      </div>
+      <div class="hardware-layout">
+        <div class="hardware-stage">
+          <div class="hardware-canvas" id="hardware-canvas"></div>
+          <div class="hardware-stage-label" aria-hidden="true"><span class="hardware-dot"></span><span id="hardware-model-label">R1 Pro leader · 7 joints</span></div>
+          <div class="hardware-placeholder" id="hardware-placeholder">
+            <p id="hardware-status" role="status">Explore the leader arms in 3D. The hardware overview is available below.</p>
+            <button type="button" id="hardware-load" hidden>Load 3D viewer</button>
+          </div>
+          <div class="hardware-camera-controls" role="group" aria-label="3D camera controls" hidden>
+            <button type="button" data-view="in" aria-label="Zoom in">+</button>
+            <button type="button" data-view="out" aria-label="Zoom out">−</button>
+            <button type="button" data-view="fit">Fit view</button>
+            <button type="button" data-view="rotate" aria-pressed="false">Auto-rotate</button>
+          </div>
+        </div>
+        <div class="hardware-sidebar">
+          <p class="hardware-eyebrow">Articulated leader</p>
+          <h4 id="hardware-model-title">R1 Pro JoyLo+</h4>
+          <p id="hardware-model-description">Explore one seven-joint leader. Two leaders form the bimanual R1 Pro interface.</p>
+          <fieldset class="hardware-joints" id="hardware-joints" hidden>
+            <legend>Move the joints</legend>
+            <div id="hardware-joint-controls"></div>
+            <button type="button" id="hardware-reset">Reset pose</button>
+            <p class="hardware-joint-note">Explore each joint’s range. Poses are illustrative; collisions are not simulated.</p>
+          </fieldset>
+          <p class="hardware-static-note">Motorized links track the policy. Grasping the touch-sensitive grip lets the operator take over.</p>
+        </div>
+      </div>
+      <div class="hardware-footer">
+        <p id="hardware-help">Drag to orbit · Scroll or pinch to zoom<br><span>Keyboard: focus the model, then use arrows to orbit, +/− to zoom, or 0 to fit.</span></p>
+        <div class="hardware-downloads"><span>Download 3D models</span><a href="./static/models/joylo-r1pro.glb" download>R1 Pro</a><a href="./static/models/joylo-franka.glb" download>Franka</a></div>
+      </div>
+    </div>
     <img class="method-image" src="./static/images/hardware.jpeg" alt="JoyLo+ correction interface in single-arm (Franka) and dual-arm (R1 Pro) configurations.">
     <p class="figure-caption">
       <strong>JoyLo+ correction interface.</strong> Motorized arm leaders track policy targets during autonomous execution
@@ -235,7 +285,7 @@
     </div>
 
     <div class="results-table-wrapper">
-      <table class="results-table">
+      <table class="results-table" id="success-results" aria-label="Autonomous full-task success rates">
         <thead>
           <tr>
             <th>Task</th>
@@ -369,7 +419,7 @@
   <div class="container is-max-desktop">
     <h2 class="title is-3">Which Correction-Learning Strategy?</h2>
     <div class="results-table-wrapper">
-      <table class="results-table">
+      <table class="results-table" id="strategy-results" aria-label="Correction-learning strategy success rates">
         <thead>
           <tr>
             <th>Setting</th>
