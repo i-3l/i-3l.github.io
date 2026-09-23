@@ -6,8 +6,10 @@ import { MeshoptDecoder } from './vendor/meshopt/meshopt_decoder.module.js';
 const models = {
   r1pro: { title: 'R1 Pro JoyLo+', label: 'R1 Pro bimanual leaders', pose: [0, -20, 0, -50, 0, 0, 0],
     description: 'Explore both seven-joint leaders. Select an arm to move its joints independently.' },
-  franka: { title: 'Franka JoyLo+', label: 'Franka leader', pose: [0, 0, 0, 0, 0, 0, 0],
-    description: 'Explore the seven-joint leader used for single-arm intervention on Franka.' }
+  // CAD-relative home: upright upper arm, horizontal forearm, grip down.
+  // These angles include the URDF's assembly offsets, not robot motor angles.
+  franka: { title: 'Franka JoyLo+', label: 'Franka leader', pose: [0, 64.288, 60.965, 125.495, -25.481, -94.564, -45],
+    description: 'Explore the seven-joint leader from its home position. Reset pose returns it home.' }
 };
 
 function assembleLeaders(source, key) {
@@ -27,8 +29,9 @@ function assembleLeaders(source, key) {
       new THREE.MeshStandardMaterial({ color: 0x898780, metalness: 0.35, roughness: 0.65 }));
     assembly.add(mount);
   } else {
-    // Display the Franka mount below its arm, as in the hardware overview.
-    source.rotation.z = Math.PI;
+    // Franka's CAD is X-up; the GLB export already applies the URDF Z-up
+    // conversion. Rotate its remaining +X axis onto the viewer's +Y axis.
+    source.rotation.z = Math.PI / 2;
     source.userData.arm = 'single';
     assembly.add(source);
   }

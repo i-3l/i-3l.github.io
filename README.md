@@ -141,8 +141,12 @@ downloads to about 4.6 MB (R1 Pro) and 2.2 MB (Franka). The files use standard
 `KHR_mesh_quantization` and `EXT_meshopt_compression` glTF extensions. Joint
 metadata is stored in node `extras.joint`. Collision/inertial geometry is omitted;
 the viewer is an illustration, not a physics or collision simulator. The R1 Pro
-starting pose bends joints 2 and 4; Franka starts at zero joint angles, with its
-display orientation flipped to put the mount below the arm.
+starting pose bends joints 2 and 4. Franka starts in an upright home preset with
+a horizontal forearm and downward grip, and Reset pose returns to that preset.
+Its CAD-relative joint angles are `[0, 64.288, 60.965, 125.495, -25.481, -94.564, -45]`
+degrees; these include the exported assembly offsets and are not robot motor
+commands. The display rotation maps the Franka source model's +X-up axis onto
+the viewer's +Y-up axis.
 
 For R1 Pro, the viewer clones the left-leader assembly and reflects it across
 the display's sagittal plane to form the right leader, matching the bilateral
