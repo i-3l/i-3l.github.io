@@ -28,6 +28,9 @@
 .hardware-sidebar > p:not(.hardware-eyebrow) { font-size: .8rem; line-height: 1.6; color: #716860; }
 .hardware-joints { border: 0; margin: 1.2rem 0 0; padding: 0; min-width: 0; }
 .hardware-joints legend { font-size: .8rem; font-weight: 600; margin: 0 0 .65rem; padding: 0; }
+.hardware-arm-controls { display: flex; gap: .35rem; margin-bottom: .8rem; }
+.hardware-arm-controls button { flex: 1; }
+.hardware-arm-controls button[aria-pressed="true"] { background: #f7e5d7; color: var(--i3l-orange-dark); border-color: #c45b28; }
 .hardware-joint { margin-bottom: .55rem; }
 .hardware-joint-heading { display: flex; justify-content: space-between; align-items: baseline; font-size: .73rem; color: #6d625a; }
 .hardware-joint-heading output { font-variant-numeric: tabular-nums; color: #4b4038; }

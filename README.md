@@ -114,12 +114,14 @@ I3L_CHROME=/usr/bin/google-chrome .venv/bin/python -m unittest discover -s tests
 ## Interactive hardware
 
 The **Explore hardware** link goes to `#hardware`. The viewer loads the R1 Pro
-leader as the section approaches the viewport; Franka loads only when selected.
-Each model is a **single leader assembly**, not a complete robot or bimanual rig.
+leaders as the section approaches the viewport; Franka loads only when selected.
+R1 Pro shows a **bimanual pair with 14 independent joints**. Use Left arm / Right
+arm to choose which seven joints to adjust; both arms remain visible and retain
+their poses. Franka shows one seven-joint leader.
 Drag to orbit, right-drag to pan, and scroll or pinch to zoom. Camera buttons and
 keyboard controls provide alternatives: focus the canvas and use arrow keys to
 orbit, +/− to zoom, and 0/Home to fit. The seven labeled sliders move joints within
-the source URDF limits. Reset pose restores the illustrated starting pose and
+the source URDF limits. Reset pose restores both arms' illustrated starting poses and
 camera. Auto-rotate is opt-in and pauses offscreen, in background tabs, and while
 printing. Nothing animates automatically, including with reduced motion enabled.
 
@@ -141,6 +143,13 @@ metadata is stored in node `extras.joint`. Collision/inertial geometry is omitte
 the viewer is an illustration, not a physics or collision simulator. The R1 Pro
 starting pose bends joints 2 and 4; Franka starts at zero joint angles, with its
 display orientation flipped to put the mount below the arm.
+
+For R1 Pro, the viewer clones the left-leader assembly and reflects it across
+the display's sagittal plane to form the right leader, matching the bilateral
+setup described in `iiil/configs/gello/gello_r1pro.yaml`. The two hierarchies share
+mesh buffers but have independent joint transforms. The 0.24 m mount spacing
+and connecting bar are illustrative, not calibrated assembly dimensions. Model
+downloads remain the original individual leader exports.
 
 To regenerate from updated CAD, run from this website directory:
 

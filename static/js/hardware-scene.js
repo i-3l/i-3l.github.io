@@ -4,11 +4,36 @@ import { GLTFLoader } from './vendor/three/GLTFLoader.js';
 import { MeshoptDecoder } from './vendor/meshopt/meshopt_decoder.module.js';
 
 const models = {
-  r1pro: { title: 'R1 Pro JoyLo+', label: 'R1 Pro leader', pose: [0, -20, 0, -50, 0, 0, 0],
-    description: 'Explore one seven-joint leader. Two leaders form the bimanual R1 Pro interface.' },
+  r1pro: { title: 'R1 Pro JoyLo+', label: 'R1 Pro bimanual leaders', pose: [0, -20, 0, -50, 0, 0, 0],
+    description: 'Explore both seven-joint leaders. Select an arm to move its joints independently.' },
   franka: { title: 'Franka JoyLo+', label: 'Franka leader', pose: [0, 0, 0, 0, 0, 0, 0],
     description: 'Explore the seven-joint leader used for single-arm intervention on Franka.' }
 };
+
+function assembleLeaders(source, key) {
+  const assembly = new THREE.Group();
+  if (key === 'r1pro') {
+    // The source URDF describes the left leader. Reflect a second copy across
+    // the sagittal plane; only transforms are cloned, so mesh buffers are shared.
+    // Mount spacing and the connecting bar are illustrative, not calibrated CAD.
+    const right = source.clone(true);
+    source.position.x = -0.12;
+    source.userData.arm = 'left';
+    right.position.x = 0.12;
+    right.scale.x = -1;
+    right.userData.arm = 'right';
+    assembly.add(source, right);
+    const mount = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.05, 0.045),
+      new THREE.MeshStandardMaterial({ color: 0x898780, metalness: 0.35, roughness: 0.65 }));
+    assembly.add(mount);
+  } else {
+    // Display the Franka mount below its arm, as in the hardware overview.
+    source.rotation.z = Math.PI;
+    source.userData.arm = 'single';
+    assembly.add(source);
+  }
+  return assembly;
+}
 
 function disposeModel(model) {
   const geometries = new Set(), materials = new Set();
@@ -27,6 +52,8 @@ export async function createHardwareViewer(root) {
   const modelButtons = [...root.querySelectorAll('[data-model]')];
   const rotateButton = root.querySelector('[data-view="rotate"]');
   const jointControls = root.querySelector('#hardware-joint-controls');
+  const armControls = root.querySelector('#hardware-arm-controls');
+  const armButtons = [...armControls.querySelectorAll('[data-arm]')];
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
@@ -90,7 +117,9 @@ export async function createHardwareViewer(root) {
     if (!model) return;
     const bounds = new THREE.Box3().setFromObject(model);
     const sphere = bounds.getBoundingSphere(new THREE.Sphere());
-    const direction = new THREE.Vector3(1, 0.45, 1.25).normalize();
+    const direction = selected === 'r1pro'
+      ? new THREE.Vector3(0.35, 0.35, 1.5).normalize()
+      : new THREE.Vector3(1, 0.45, 1.25).normalize();
     const right = new THREE.Vector3().crossVectors(camera.up, direction).normalize();
     const up = new THREE.Vector3().crossVectors(direction, right);
     const vertical = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
@@ -152,22 +181,36 @@ export async function createHardwareViewer(root) {
     render();
   }
 
+  function selectArm(arm) {
+    armButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.arm === arm)));
+    joints.forEach(joint => { joint.row.hidden = joint.arm !== arm; });
+  }
+
   function buildJoints() {
     joints = [];
-    model.traverse(node => {
-      if (node.userData.joint) joints.push({ ...node.userData.joint, node,
-        origin: node.quaternion.clone(), axis: new THREE.Vector3(...node.userData.joint.axis).normalize() });
+    model.children.filter(leader => leader.userData.arm).forEach(leader => {
+      const armJoints = [];
+      leader.traverse(node => {
+        if (node.userData.joint) armJoints.push({ ...node.userData.joint, node,
+          arm: leader.userData.arm, origin: node.quaternion.clone(),
+          axis: new THREE.Vector3(...node.userData.joint.axis).normalize() });
+      });
+      armJoints.sort((a, b) => Number(a.name) - Number(b.name));
+      armJoints.forEach((joint, index) => {
+        joint.number = index + 1;
+        joint.initial = models[selected].pose[index];
+      });
+      joints.push(...armJoints);
     });
-    joints.sort((a, b) => Number(a.name) - Number(b.name));
     jointControls.replaceChildren();
-    joints.forEach((joint, index) => {
+    joints.forEach(joint => {
       const row = document.createElement('div');
       row.className = 'hardware-joint';
       const heading = document.createElement('div');
       heading.className = 'hardware-joint-heading';
       const label = document.createElement('label');
-      label.htmlFor = `hardware-joint-${index}`;
-      label.textContent = `Joint ${index + 1}`;
+      label.htmlFor = `hardware-joint-${joint.arm}-${joint.number}`;
+      label.textContent = `${joint.arm === 'single' ? '' : `${joint.arm === 'left' ? 'Left' : 'Right'} `}Joint ${joint.number}`;
       const output = document.createElement('output');
       output.htmlFor = label.htmlFor;
       const input = document.createElement('input');
@@ -178,6 +221,7 @@ export async function createHardwareViewer(root) {
       input.step = 'any';
       joint.input = input;
       joint.output = output;
+      joint.row = row;
       input.addEventListener('input', () => { stopRotation(); setJoint(joint, Number(input.value)); });
       // An explicit degree step is predictable even when URDF limits are fractional.
       input.addEventListener('keydown', event => {
@@ -187,8 +231,10 @@ export async function createHardwareViewer(root) {
       heading.append(label, output);
       row.append(heading, input);
       jointControls.append(row);
-      setJoint(joint, models[selected].pose[index]);
+      setJoint(joint, joint.initial);
     });
+    armControls.hidden = selected !== 'r1pro';
+    selectArm(selected === 'r1pro' ? 'left' : 'single');
   }
 
   async function selectModel(key) {
@@ -208,9 +254,7 @@ export async function createHardwareViewer(root) {
       });
       if (destroyed) { disposeModel(result.scene); return; }
       if (model) { scene.remove(model); disposeModel(model); }
-      model = result.scene;
-      // Display the Franka mount below its arm, as in the hardware overview.
-      if (key === 'franka') model.rotation.z = Math.PI;
+      model = assembleLeaders(result.scene, key);
       scene.add(model);
       selected = key;
       buildJoints();
@@ -225,7 +269,7 @@ export async function createHardwareViewer(root) {
       root.querySelector('.hardware-camera-controls').hidden = false;
       root.querySelector('#hardware-joints').hidden = false;
       placeholder.hidden = true;
-      notice.textContent = `${models[key].label} loaded. Seven joints available.`;
+      notice.textContent = `${models[key].label} loaded. ${joints.length} joints available.`;
       fit();
     } catch (error) {
       if (!model) throw error;
@@ -256,9 +300,10 @@ export async function createHardwareViewer(root) {
   controls.addEventListener('change', render);
   controls.addEventListener('start', stopRotation);
   modelButtons.forEach(button => button.addEventListener('click', () => selectModel(button.dataset.model)));
+  armButtons.forEach(button => button.addEventListener('click', () => selectArm(button.dataset.arm)));
   root.querySelector('#hardware-reset').addEventListener('click', () => {
     stopRotation();
-    joints.forEach((joint, index) => setJoint(joint, models[selected].pose[index]));
+    joints.forEach(joint => setJoint(joint, joint.initial));
     fit();
   });
   root.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => {

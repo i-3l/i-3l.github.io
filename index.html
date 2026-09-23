@@ -112,14 +112,14 @@
           <h3 id="hardware-viewer-title">Explore the device</h3>
         </div>
         <div class="hardware-models" role="group" aria-label="Leader configuration" hidden>
-          <button type="button" data-model="r1pro" aria-pressed="true">R1 Pro leader</button>
+          <button type="button" data-model="r1pro" aria-pressed="true">R1 Pro bimanual</button>
           <button type="button" data-model="franka" aria-pressed="false">Franka leader</button>
         </div>
       </div>
       <div class="hardware-layout">
         <div class="hardware-stage">
           <div class="hardware-canvas" id="hardware-canvas"></div>
-          <div class="hardware-stage-label" aria-hidden="true"><span class="hardware-dot"></span><span id="hardware-model-label">R1 Pro leader · 7 joints</span></div>
+          <div class="hardware-stage-label" aria-hidden="true"><span class="hardware-dot"></span><span id="hardware-model-label">R1 Pro bimanual leaders · 14 joints</span></div>
           <div class="hardware-placeholder" id="hardware-placeholder">
             <p id="hardware-status" role="status">Explore the leader arms in 3D. The hardware overview is available below.</p>
             <button type="button" id="hardware-load" hidden>Load 3D viewer</button>
@@ -132,11 +132,15 @@
           </div>
         </div>
         <div class="hardware-sidebar">
-          <p class="hardware-eyebrow">Articulated leader</p>
+          <p class="hardware-eyebrow">Articulated leaders</p>
           <h4 id="hardware-model-title">R1 Pro JoyLo+</h4>
-          <p id="hardware-model-description">Explore one seven-joint leader. Two leaders form the bimanual R1 Pro interface.</p>
+          <p id="hardware-model-description">Explore both seven-joint leaders. Select an arm to move its joints independently.</p>
           <fieldset class="hardware-joints" id="hardware-joints" hidden>
             <legend>Move the joints</legend>
+            <div class="hardware-arm-controls" id="hardware-arm-controls" role="group" aria-label="Arm to control" hidden>
+              <button type="button" data-arm="left" aria-pressed="true" aria-controls="hardware-joint-controls">Left arm</button>
+              <button type="button" data-arm="right" aria-pressed="false" aria-controls="hardware-joint-controls">Right arm</button>
+            </div>
             <div id="hardware-joint-controls"></div>
             <button type="button" id="hardware-reset">Reset pose</button>
             <p class="hardware-joint-note">Explore each joint’s range. Poses are illustrative; collisions are not simulated.</p>
@@ -146,7 +150,7 @@
       </div>
       <div class="hardware-footer">
         <p id="hardware-help">Drag to orbit · Scroll or pinch to zoom<br><span>Keyboard: focus the model, then use arrows to orbit, +/− to zoom, or 0 to fit.</span></p>
-        <div class="hardware-downloads"><span>Download 3D models</span><a href="./static/models/joylo-r1pro.glb" download>R1 Pro</a><a href="./static/models/joylo-franka.glb" download>Franka</a></div>
+        <div class="hardware-downloads"><span>Download individual leader models</span><a href="./static/models/joylo-r1pro.glb" download>R1 Pro</a><a href="./static/models/joylo-franka.glb" download>Franka</a></div>
       </div>
     </div>
     <img class="method-image" src="./static/images/hardware.jpeg" alt="JoyLo+ correction interface in single-arm (Franka) and dual-arm (R1 Pro) configurations.">

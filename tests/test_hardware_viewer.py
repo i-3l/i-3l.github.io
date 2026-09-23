@@ -66,7 +66,7 @@ class HardwareViewerTests(unittest.TestCase):
             self.page.locator(f'button[data-model="{model}"]').click()
             expect(self.page.locator('#hardware-viewer')).to_have_attribute('data-model', model, timeout=30000)
             inputs = self.page.locator('#hardware-joint-controls input')
-            self.assertEqual(inputs.count(), 7)
+            self.assertEqual(inputs.count(), 14 if model == 'r1pro' else 7)
             initial = inputs.evaluate_all('(nodes) => nodes.map(n => n.value)')
             before = canvas.screenshot()
             # Joint 4 moves the distal assembly; this must change actual rendered pixels.
@@ -75,7 +75,9 @@ class HardwareViewerTests(unittest.TestCase):
             self.page.get_by_role('button', name='Reset pose', exact=True).click()
             self.assertEqual(initial, inputs.evaluate_all('(nodes) => nodes.map(n => n.value)'))
             # Every range is keyboard operable and bounded by the source limits.
-            for index in range(7):
+            for index in range(inputs.count()):
+                if model == 'r1pro':
+                    self.page.get_by_role('button', name='Left arm' if index < 7 else 'Right arm', exact=True).click()
                 slider = inputs.nth(index)
                 slider.focus()
                 slider.press('Home')
@@ -92,6 +94,33 @@ class HardwareViewerTests(unittest.TestCase):
             self.page.locator('.hardware-downloads a').last.click()
         self.assertEqual(info.value.suggested_filename, 'joylo-franka.glb')
         self.assertEqual(Path(info.value.path()).read_bytes()[:4], b'glTF')
+
+    def test_bimanual_arms_move_independently_and_reset_together(self):
+        canvas = self.load()
+        expect(self.page.locator('#hardware-model-label')).to_contain_text('14 joints')
+        inputs = self.page.locator('#hardware-joint-controls input')
+        initial = inputs.evaluate_all('(nodes) => nodes.map(n => n.value)')
+        for arm, offset in [('Left', 0), ('Right', 7)]:
+            before_values = inputs.evaluate_all('(nodes) => nodes.map(n => n.value)')
+            before_image = canvas.screenshot()
+            self.page.get_by_role('button', name=f'{arm} arm', exact=True).click()
+            expect(self.page.get_by_role('slider')).to_have_count(7)
+            self.page.get_by_label(f'{arm} Joint 4', exact=True).evaluate(
+                '(n) => { n.value = -85; n.dispatchEvent(new Event("input")); }')
+            self.assertNotEqual(before_image, canvas.screenshot())
+            after_values = inputs.evaluate_all('(nodes) => nodes.map(n => n.value)')
+            changed = [i for i in range(14) if before_values[i] != after_values[i]]
+            self.assertEqual(changed, [offset + 3])
+        self.page.get_by_role('button', name='Reset pose', exact=True).click()
+        self.assertEqual(initial, inputs.evaluate_all('(nodes) => nodes.map(n => n.value)'))
+        # Switching configurations must rebuild both independent joint trees.
+        self.page.get_by_role('button', name='Franka leader', exact=True).click()
+        expect(self.page.locator('#hardware-viewer')).to_have_attribute('data-model', 'franka', timeout=30000)
+        expect(self.page.locator('#hardware-arm-controls')).to_be_hidden()
+        self.page.get_by_role('button', name='R1 Pro bimanual', exact=True).click()
+        expect(self.page.locator('#hardware-viewer')).to_have_attribute('data-model', 'r1pro', timeout=30000)
+        expect(self.page.get_by_role('button', name='Left arm', exact=True)).to_have_attribute('aria-pressed', 'true')
+        self.assertEqual(initial, inputs.evaluate_all('(nodes) => nodes.map(n => n.value)'))
 
     def test_orbit_zoom_keyboard_rotation_and_print(self):
         self.page.emulate_media(reduced_motion='reduce')
