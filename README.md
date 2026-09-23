@@ -18,9 +18,9 @@ This serves your local copy; publishing changes to GitHub Pages is a separate st
 
 - `index.html` — the page
 - `static/css/index.css` — site styles (Bulma + custom)
-- `static/css/interactive-figures.css` — figure viewer and chart styles
-- `static/js/figure-config.js` — figure titles, focused panels, and activation data
-- `static/js/interactive-figures.js` — viewer, touch/keyboard controls, and charts
+- `static/css/interactive-figures.css` — component explanation and chart styles
+- `static/js/figure-config.js` — figure titles, component explanations, and activation data
+- `static/js/interactive-figures.js` — inline component explanations and charts
 - `static/css/hardware-viewer.css` — hardware section and responsive 3D viewer
 - `static/js/hardware-viewer.js` — lazy loading and startup fallback
 - `static/js/hardware-scene.js` — 3D rendering, joint articulation, and camera controls
@@ -35,7 +35,7 @@ All seven figures have numbered component hotspots. **Hover, click, tap, or use
 Tab to focus a component** to show its explanation directly below the figure.
 The explanation stays visible until you select another component, so it is easy
 to read. Each information card links to the corresponding figure in the paper.
-The same components remain interactive when a figure is enlarged.
+Figures stay inline when clicked; there is no enlarged popup viewer.
 
 The annotations cover the correction/retraining loop, leader arms and touch
 detection, each evaluation task, intervention metrics, task-stage failure modes,
@@ -55,11 +55,6 @@ without changing the interaction code.
 
 ## Additional interactions
 
-- **All seven figures:** use Explore to expand a figure. Choose a Focus panel and
-  Explore to inspect a task, hardware section, or subplot. Use the mouse wheel,
-  pinch gesture, or +/− buttons to zoom; drag or use arrow keys to pan. Fit (or 0)
-  resets the current panel. Escape closes the viewer and restores keyboard focus.
-  Previous/Next traverses the figures; Download original saves the complete image.
 - **Success and learning-strategy results:** filter tasks, toggle comparisons,
   and hover, tap, or focus a bar for its published value. CSV downloads contain all
   comparison columns for the selected task group, including hidden comparisons.
@@ -73,11 +68,10 @@ shows the original figures and published tables.
 ## Change figures or data
 
 Replace images under `static/images/`, or update their paths in `index.html`.
-Images with `teaser-image` or `method-image` are automatically expandable.
-Add entries to `figure-config.js` to customize their titles and Focus panels.
-Panel bounds are `[left, top, width, height]`, normalized to the original image
-dimensions, with all coordinates between 0 and 1. Cropping happens only in the
-viewer; image files stay intact.
+Images with `teaser-image` or `method-image` receive inline component explanations
+from `figure-config.js`. Customize their titles, hotspot bounds, and descriptions
+there. Bounds are `[left, top, width, height]`, normalized to the original image
+dimensions, with all coordinates between 0 and 1.
 
 The success and strategy charts read their values directly from `#success-results`
 and `#strategy-results` in `index.html`. **Edit those tables to update the charts.**
@@ -93,13 +87,13 @@ of 99.9%.
 
 The repository contains raster exports, **not the underlying numeric series**,
 for intervention trends, task-stage curves, and the operator study. Those figures
-support panel selection, zoom, pan, and original-image download. Exact point
-tooltips or per-series filtering for those curves require the original plotting
-data; no values have been estimated from pixels.
+provide inline component explanations. Exact point tooltips or per-series
+filtering for those curves require the original plotting data; no values have
+been estimated from pixels.
 
 ## Browser checks
 
-The optional tests cover component hover/click/focus, all figures, keyboard focus, zoom/pan, touch pinch,
+The optional tests cover component hover/click/focus, figures staying inline,
 task/series filters, published values, CSV export, mobile layout, printing, and
 the no-JavaScript fallback. They start their own temporary server and block
 external requests.

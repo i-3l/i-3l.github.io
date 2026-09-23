@@ -1,4 +1,4 @@
-/* Editable figure titles and panel bounds: [left, top, width, height], from 0 to 1.
+/* Editable figure titles and component bounds: [left, top, width, height], from 0 to 1.
  * Bounds select regions of the original image; they do not approximate plot data.
  */
 window.I3L_FIGURES = {
@@ -10,11 +10,6 @@ window.I3L_FIGURES = {
       ["The iterative learning loop", [0.312, 0, 0.309, 1], "Original demonstrations and active human corrections are aggregated for retraining. Each round starts from the same initial weights, then redeploys the updated policy to collect corrections for its remaining failures."],
       ["Three embodiments, eight tasks", [0.628, 0, 0.372, 1], "I3L is evaluated on A1, Franka, and R1 Pro across simulated and real-world tasks. Four rounds of corrective learning achieve at least 90% autonomous success on each of the eight tasks."]
     ],
-    panels: [
-      ["Whole-body corrections", [0, 0, 0.31, 1]],
-      ["Iterative corrective learning", [0.31, 0, 0.315, 1]],
-      ["Tasks and embodiments", [0.625, 0, 0.375, 1]]
-    ]
   },
   "hardware.jpeg": {
     title: "JoyLo+ hardware interface",
@@ -27,12 +22,6 @@ window.I3L_FIGURES = {
       ["Whole-body human gate", [0.62, 0.72, 0.117, 0.27], "On R1 Pro, touching a grip or using a JoyCon transfers command of both arms, torso, base, and grippers together. Releasing the interface returns control to the policy, which replans from the corrected state."],
       ["Franka and R1 Pro execution", [0.764, 0, 0.236, 0.79], "The same interaction supports single-arm Franka manipulation and bimanual whole-body R1 Pro manipulation. The leaders guide the arms; JoyCon inputs control the torso, mobile base, and grippers."]
     ],
-    panels: [
-      ["JoyLo+ leaders", [0, 0, 0.37, 1]],
-      ["Capacitive takeover", [0.37, 0, 0.385, 0.69]],
-      ["Robot execution", [0.76, 0, 0.24, 0.8]],
-      ["Control loop", [0.37, 0.68, 0.63, 0.32]]
-    ]
   },
   "tasks.jpeg": {
     title: "Tasks and embodiments",
@@ -47,16 +36,6 @@ window.I3L_FIGURES = {
       ["Peg Insertion", [0.535, 0.505, 0.202, 0.495], "A precision Franka task requiring a successful grasp and aligned insertion. Corrections improve autonomous success from 7/25 episodes (28%) to 23/25 (92%)."],
       ["Open Fridge and Pick Up Radio", [0.737, 0.505, 0.263, 0.495], "A controlled R1 Pro simulation task in BEHAVIOR. Four-round HG-DAgger reaches 90.0% success, compared with 39.6% for the base policy and 30.4% after additional demonstrations."]
     ],
-    panels: [
-      ["Breakfast bowls", [0, 0, 0.27, 0.505]],
-      ["Boxing books", [0.27, 0, 0.265, 0.505]],
-      ["Mug hanging", [0.535, 0, 0.202, 0.505]],
-      ["Strawberries", [0.737, 0, 0.263, 0.505]],
-      ["Microwave popcorn", [0, 0.505, 0.27, 0.495]],
-      ["Turning on radio", [0.27, 0.505, 0.265, 0.495]],
-      ["Peg insertion", [0.535, 0.505, 0.202, 0.495]],
-      ["Open fridge", [0.737, 0.505, 0.263, 0.495]]
-    ]
   },
   "intervention_trends.png": {
     title: "Intervention burden across rounds",
@@ -67,14 +46,6 @@ window.I3L_FIGURES = {
       ["Shorter intervention duration", [0.5, 0, 0.246, 0.865], "This panel measures total seconds under intervention per episode. The equal-weight task mean decreases by 72.0% from Round 1 to Round 4; all three burden measures decline in every round."],
       ["Collection and final evaluation", [0.75, 0, 0.25, 0.865], "Rounds 1–4 show takeover-free episodes during correction collection. The final bar reports autonomous evaluation after training: every task reaches at least 90% success. The dashed 58.3% line is the demo-only evaluation baseline."]
     ],
-    note: "Rounds 1–4 are correction collection. Final success is autonomous evaluation; the demo-only reference is 58.3%. The dark line is the equal-weight mean across eight tasks.",
-    panels: [
-      ["Takeover count", [0, 0, 0.247, 0.865]],
-      ["Takeover percentage", [0.25, 0, 0.247, 0.865]],
-      ["Takeover duration", [0.5, 0, 0.246, 0.865]],
-      ["Success rate", [0.75, 0, 0.25, 0.865]],
-      ["Task legend", [0.155, 0.88, 0.715, 0.12]]
-    ]
   },
   "correction.png": {
     title: "Task-stage correction patterns",
@@ -89,18 +60,6 @@ window.I3L_FIGURES = {
       ["Strawberries: pickup and placement", [0.014, 0.736, 0.486, 0.24], "The simulation example shows failed grasp and stuck states across picking and placing the red and purple strawberries. Curves describe intervention rate along normalized episode progress."],
       ["Fridge: handle and radio alignment", [0.51, 0.736, 0.49, 0.24], "The annotated failures are missing the fridge handle and misalignment with the radio. The sequence covers opening the fridge, navigating, and placing the radio."]
     ],
-    note: "Intervention rate (%) over normalized episode progress. Dotted, dash-dot, dashed, and solid orange curves indicate Rounds 1–4. Red arrows mark corrected failures; green arrows mark successful behavior.",
-    panels: [
-      ["Breakfast bowls", [0.014, 0, 0.486, 0.236]],
-      ["Boxing books", [0.51, 0, 0.49, 0.236]],
-      ["Mug hanging", [0.014, 0.239, 0.486, 0.25]],
-      ["Peg insertion", [0.51, 0.239, 0.49, 0.25]],
-      ["Microwave popcorn", [0.014, 0.49, 0.486, 0.245]],
-      ["Turning on radio", [0.51, 0.49, 0.49, 0.245]],
-      ["Strawberries", [0.014, 0.736, 0.486, 0.24]],
-      ["Open fridge", [0.51, 0.736, 0.49, 0.24]],
-      ["Round and annotation legend", [0, 0.976, 1, 0.024]]
-    ]
   },
   "whole_body_takeover.png": {
     title: "Whole-body activation shares",
@@ -114,13 +73,6 @@ window.I3L_FIGURES = {
       ["Popcorn activation breakdown", [0.26, 0.325, 0.71, 0.1], "Base 42.2% · Torso 0% · Left arm 37.9% · Right arm 19.8%. The printed shares total 99.9% because of rounding. These are activation-vote shares, not percentages of time."],
       ["Breakfast activation breakdown", [0.26, 0.475, 0.71, 0.1], "Base 27.9% · Torso 3.8% · Left arm 36.5% · Right arm 31.7%. The shares pool four rounds of 25 episodes, describing coordinated use of the base, torso, and both arms."],
       ["Radio activation breakdown", [0.26, 0.625, 0.71, 0.1], "Base 35.6% · Torso 7.6% · Left arm 47.0% · Right arm 9.8%. Radio corrections are more left-arm dominant than the Books and Breakfast tasks."]
-    ],
-    note: "Each body part receives one vote per takeover segment after three consecutive active frames. Shares are pooled over four 25-episode rounds.",
-    panels: [
-      ["Boxing books", [0, 0.16, 1, 0.15]],
-      ["Microwave popcorn", [0, 0.31, 1, 0.15]],
-      ["Breakfast bowls", [0, 0.46, 1, 0.15]],
-      ["Turning on radio", [0, 0.61, 1, 0.14]]
     ],
     // Transcribed from the printed labels in whole_body_takeover.png (Fig. 6).
     // Printed rounding is preserved; values are not renormalized to 100%.
@@ -143,11 +95,5 @@ window.I3L_FIGURES = {
       ["Operator 3", [0.59, 0.915, 0.17, 0.085], "Cumulative intervention share decreases from 16.4% to 14.7% across three rounds. All three operators show declining cumulative intervention burden despite differing teleoperation experience."],
       ["Takeover-free episodes", [0.63, 0.115, 0.36, 0.66], "This panel counts cumulative episodes completed without a takeover. By Round 3, these account for 40–55% of each operator’s cumulative collection. The complete study contains 225 episodes: 3 operators × 3 rounds × 25 episodes."]
     ],
-    note: "Each operator collects 25 episodes per round. Both panels show cumulative measurements across rounds, rather than individual-round rates.",
-    panels: [
-      ["Cumulative intervention share", [0, 0, 0.49, 0.905]],
-      ["Cumulative takeover-free episodes", [0.52, 0, 0.48, 0.905]],
-      ["Operator legend", [0.235, 0.915, 0.53, 0.085]]
-    ]
   }
 };

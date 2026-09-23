@@ -54,54 +54,16 @@ class InteractiveFiguresTests(unittest.TestCase):
         self.context.close()
         self.assertEqual(self.errors, [])
 
-    def test_every_figure_opens_and_restores_keyboard_focus(self):
-        openers = self.page.locator(".figure-image-button")
-        self.assertEqual(openers.count(), 7)
-        for index in range(openers.count()):
-            opener = openers.nth(index)
-            opener.focus()
-            self.page.keyboard.press("Enter")
-            expect(self.page.locator("dialog")).to_be_visible()
-            self.page.wait_for_function("document.querySelector('.viewer-stage').dataset.ready === 'true'")
-            expect(self.page.locator(".viewer-zoom")).to_have_text("100%")
-            self.page.keyboard.press("Escape")
-            expect(self.page.locator("dialog")).not_to_be_visible()
-            expect(opener).to_be_focused()
-            self.assertEqual(self.page.evaluate("document.body.style.overflow"), "")
-
-    def test_zoom_pan_fit_panel_selection_navigation_and_focus_trap(self):
-        self.page.get_by_role("button", name="Explore Task-stage correction patterns", exact=True).click()
-        self.page.wait_for_function("document.querySelector('.viewer-stage').dataset.ready === 'true'")
-        panel = self.page.locator("#figure-viewer-panel")
-        panel.select_option(label="Mug hanging")
-        expect(self.page.locator(".viewer-zoom")).to_have_text("100%")
-        stage = self.page.locator(".viewer-stage")
-        stage.focus()
-        self.page.keyboard.press("+")
-        self.page.keyboard.press("+")
-        expect(self.page.locator(".viewer-zoom")).to_have_text("196%")
-        before = self.page.locator(".viewer-crop").evaluate("e => e.style.transform")
-        self.page.keyboard.press("ArrowRight")
-        self.assertNotEqual(before, self.page.locator(".viewer-crop").evaluate("e => e.style.transform"))
-        self.page.keyboard.press("0")
-        expect(self.page.locator(".viewer-zoom")).to_have_text("100%")
-        stage.hover()
-        self.page.mouse.wheel(0, -100)
-        expect(self.page.locator(".viewer-zoom")).not_to_have_text("100%")
-        box = stage.bounding_box()
-        self.page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
-        self.page.mouse.down()
-        before = self.page.locator(".viewer-crop").evaluate("e => e.style.transform")
-        self.page.mouse.move(box["x"] + box["width"] / 2 - 80, box["y"] + box["height"] / 2, steps=5)
-        self.page.mouse.up()
-        self.assertNotEqual(before, self.page.locator(".viewer-crop").evaluate("e => e.style.transform"))
-        self.page.get_by_role("button", name="Next figure →", exact=True).click()
-        expect(self.page.locator(".viewer-title")).to_have_text("Whole-body activation shares")
-        self.assertEqual(panel.input_value(), "-1")
-        self.page.get_by_role("button", name="Close ×", exact=True).focus()
-        for _ in range(15):
-            self.page.keyboard.press("Tab")
-            self.assertTrue(self.page.evaluate("!!document.activeElement.closest('dialog')"))
+    def test_every_figure_stays_inline_when_clicked(self):
+        canvases = self.page.locator(".figure-canvas")
+        self.assertEqual(canvases.count(), 7)
+        expect(self.page.locator(".figure-image-button, .figure-toolbar")).to_have_count(0)
+        for index in range(canvases.count()):
+            canvas = canvases.nth(index)
+            canvas.click(position={"x": 1, "y": 1})
+            expect(canvas.locator("img")).to_be_visible()
+            expect(self.page.get_by_role("dialog")).to_have_count(0)
+            self.assertNotEqual(self.page.evaluate("getComputedStyle(document.body).overflow"), "hidden")
 
     def test_success_filters_values_and_download(self):
         chart = self.page.get_by_role("region", name="Explore autonomous success", exact=True)
@@ -140,30 +102,13 @@ class InteractiveFiguresTests(unittest.TestCase):
         expect(body.get_by_role("status")).to_contain_text("Torso: 0%")
         self.assertEqual(torso.locator(".chart-fill").bounding_box()["width"], 0)
 
-    def test_mobile_touch_pinch_and_layout(self):
+    def test_mobile_layout(self):
         self.page.set_viewport_size({"width": 390, "height": 844})
         self.assertLessEqual(self.page.evaluate("document.documentElement.scrollWidth"), 390)
-        self.page.get_by_role("button", name="Explore Tasks and embodiments", exact=True).click()
-        self.page.wait_for_function("document.querySelector('.viewer-stage').dataset.ready === 'true'")
-        self.page.locator("#figure-viewer-panel").select_option(label="Peg insertion")
-        stage = self.page.locator(".viewer-stage")
-        stage_box = stage.bounding_box()
-        session = self.context.new_cdp_session(self.page)
-        x = stage_box["x"] + stage_box["width"] / 2
-        y = stage_box["y"] + stage_box["height"] / 2
-        def points(distance):
-            return [{"x": x - distance, "y": y, "id": 1}, {"x": x + distance, "y": y, "id": 2}]
-        session.send("Input.dispatchTouchEvent", {"type": "touchStart", "touchPoints": points(40)})
-        session.send("Input.dispatchTouchEvent", {"type": "touchMove", "touchPoints": points(80)})
-        session.send("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
-        expect(self.page.locator(".viewer-zoom")).not_to_have_text("100%")
-        self.assertLessEqual(self.page.evaluate("document.documentElement.scrollWidth"), 390)
-        for selector in [".viewer-header", ".viewer-toolbar", ".viewer-navigation"]:
-            self.assertLessEqual(self.page.locator(selector).evaluate("e => e.scrollWidth"), 390)
-        self.page.get_by_role("button", name="Fit", exact=True).click()
-        expect(self.page.locator(".viewer-zoom")).to_have_text("100%")
+        for canvas in self.page.locator(".figure-canvas").all():
+            self.assertLessEqual(canvas.evaluate("e => e.scrollWidth"), 390)
 
-    def test_component_hover_click_keyboard_and_enlarged_view(self):
+    def test_component_hover_click_and_keyboard(self):
         wrappers = self.page.locator(".interactive-figure")
         for index in range(7):
             wrapper = wrappers.nth(index)
@@ -181,17 +126,6 @@ class InteractiveFiguresTests(unittest.TestCase):
             expect(wrapper.locator(".info-title")).to_have_text(last_title)
             component.click()
             expect(wrapper.locator(".info-title")).to_have_text(title)
-        self.page.get_by_role("button", name="Explore JoyLo+ hardware interface", exact=True).click()
-        self.page.wait_for_function("document.querySelector('.viewer-stage').dataset.ready === 'true'")
-        touch = self.page.locator("dialog").get_by_role("button", name="2. Copper touch electrodes", exact=True)
-        touch.click()
-        expect(self.page.locator(".viewer-info .info-title")).to_have_text("Copper touch electrodes")
-        expect(self.page.locator(".viewer-info .info-body")).to_contain_text("Grasping")
-        self.page.locator("#figure-viewer-panel").select_option(label="Robot execution")
-        expect(touch).to_be_hidden()
-        robots = self.page.locator("dialog").get_by_role("button", name="6. Franka and R1 Pro execution", exact=True)
-        robots.click()
-        expect(self.page.locator(".viewer-info .info-title")).to_have_text("Franka and R1 Pro execution")
 
     def test_no_javascript_and_print_preserve_published_content(self):
         context = self.browser.new_context(java_script_enabled=False)
@@ -206,7 +140,7 @@ class InteractiveFiguresTests(unittest.TestCase):
         self.page.emulate_media(media="print")
         expect(self.page.locator("#success-results")).to_be_visible()
         expect(self.page.locator("#strategy-results")).to_be_visible()
-        expect(self.page.locator(".figure-toolbar").first).not_to_be_visible()
+        expect(self.page.locator(".hotspot-layer").first).not_to_be_visible()
         self.page.emulate_media(media="screen")
         self.page.evaluate("dispatchEvent(new Event('afterprint'))")
         expect(self.page.locator("#success-results")).not_to_be_visible()
