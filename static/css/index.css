@@ -185,23 +185,6 @@ h1.title.publication-title {
   height: 100%;
 }
 
-.video-placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #ddd;
-  gap: 0.5rem;
-  font-size: 1.05rem;
-}
-
-.video-placeholder i {
-  font-size: 2.5rem;
-  color: var(--i3l-orange);
-}
-
 .method-image {
   padding: 0;
   display: block;

@@ -26,7 +26,7 @@ This serves your local copy; publishing changes to GitHub Pages is a separate st
 - `static/js/hardware-scene.js` — 3D rendering, joint articulation, and camera controls
 - `static/models/` — self-contained GLB models exported from the repository CAD
 - `static/images/` — figures exported from the paper
-- `static/videos/` — put the walkthrough / teaser video here
+- `static/videos/walkthrough.mp4` — walkthrough video (poster frame: `static/images/video_poster.jpg`)
 - `static/paper.pdf` — drop the compiled paper here (the Paper button links to it)
 
 ## Component explanations

@@ -92,13 +92,11 @@
   <div class="container is-max-desktop">
     <h2 class="title is-3">Walkthrough Video</h2>
     <div class="publication-video">
-      <!-- TODO: replace with the real video, e.g.
-           <video controls playsinline muted preload="none"><source src="./static/videos/overview.mp4" type="video/mp4"></video>
-           or a YouTube embed: <iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID" allowfullscreen></iframe> -->
-      <div class="video-placeholder">
-        <i class="fa fa-play-circle"></i>
-        <span>Video coming soon</span>
-      </div>
+      <video controls playsinline preload="metadata" poster="./static/images/video_poster.jpg"
+             aria-label="I3L walkthrough video">
+        <source src="./static/videos/walkthrough.mp4" type="video/mp4">
+        Your browser does not support embedded video. <a href="./static/videos/walkthrough.mp4">Download the walkthrough (MP4)</a>.
+      </video>
     </div>
   </div>
 </div>
