@@ -3,7 +3,8 @@
   'use strict';
   const script = document.currentScript;
   const endpoint = script?.dataset.endpoint;
-  if (!endpoint || location.hostname !== 'i-3l.github.io' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
+  // The collector derives the website from its exact, configured Origin.
+  if (!endpoint) return;
   if (navigator.doNotTrack === '1' || navigator.globalPrivacyControl || new URLSearchParams(location.search).get('analytics') === 'off') return;
   if (!crypto.randomUUID) return;
   const uuid = () => crypto.randomUUID();
@@ -41,8 +42,8 @@
   addEventListener('online', flush);
   function finalFlush() {
     if (!sentPage || queue.length) {
-      const body = new Blob([JSON.stringify({ page, events: queue.slice(0, 20) })], { type: 'text/plain' });
-      navigator.sendBeacon?.(endpoint, body);
+      // Explicit CORS preserves Origin even with the review site's no-referrer policy.
+      fetch(endpoint, { method: 'POST', mode: 'cors', credentials: 'omit', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ page, events: queue.slice(0, 20) }) }).catch(() => {});
     }
   }
 

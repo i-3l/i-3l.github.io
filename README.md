@@ -185,7 +185,7 @@ No cookies or persistent browser identifiers are used. Five reloads count as fiv
 pageviews and an estimated single visitor within the same UTC day. Multi-day
 visitor estimates are visitor-days. Location is approximate, and blockers, bots
 and network failures affect coverage. Do Not Track, Global Privacy Control and
-`?analytics=off` disable tracking. The page footer explains the measurement.
+`?analytics=off` disable tracking.
 
 Clear the analytics script's `data-endpoint` in `index.html` to disable collection.
 Keep account credentials, dashboard configuration, and raw data out of this public
