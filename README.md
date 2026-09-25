@@ -173,3 +173,20 @@ requests for models, decoders, or renderer code. The hardware browser tests load
 the real models and check lazy loading, articulation, limits, reset, switching,
 downloads, camera controls, mobile touch, printing, retry, and no-JS/no-WebGL
 fallbacks. Headless hardware tests enable Chromium's software WebGL renderer.
+
+## Private website measurement
+
+`static/js/analytics.js` records page loads and deliberate figure, chart, link,
+download and hardware interactions through the site's Cloudflare collector.
+Passive observations include section reach, scroll depth, approximate active time,
+model load time and viewer errors. The dashboard and database are private.
+
+No cookies or persistent browser identifiers are used. Five reloads count as five
+pageviews and an estimated single visitor within the same UTC day. Multi-day
+visitor estimates are visitor-days. Location is approximate, and blockers, bots
+and network failures affect coverage. Do Not Track, Global Privacy Control and
+`?analytics=off` disable tracking. The page footer explains the measurement.
+
+Clear the analytics script's `data-endpoint` in `index.html` to disable collection.
+Keep account credentials, dashboard configuration, and raw data out of this public
+repository. Collector failure must never prevent the page or viewer from working.

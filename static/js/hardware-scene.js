@@ -242,6 +242,7 @@ export async function createHardwareViewer(root) {
 
   async function selectModel(key) {
     if (busy || selected === key) return;
+    const loadStart = performance.now();
     const focusedButton = document.activeElement;
     busy = true;
     stopRotation();
@@ -268,6 +269,7 @@ export async function createHardwareViewer(root) {
       modelButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.model === key)));
       root.dataset.model = key;
       root.dataset.state = 'ready';
+      window.I3LAnalytics?.track('model_load', { model: key, target: key, section: 'hardware', value: Math.round(performance.now() - loadStart) });
       root.querySelector('.hardware-models').hidden = false;
       root.querySelector('.hardware-camera-controls').hidden = false;
       root.querySelector('#hardware-joints').hidden = false;
@@ -275,6 +277,7 @@ export async function createHardwareViewer(root) {
       notice.textContent = `${models[key].label} loaded. ${joints.length} joints available.`;
       fit();
     } catch (error) {
+      window.I3LAnalytics?.track('viewer_error', { model: key, target: 'model_load', section: 'hardware' });
       if (!model) throw error;
       placeholder.hidden = true;
       notice.hidden = false;
@@ -350,6 +353,7 @@ export async function createHardwareViewer(root) {
   window.addEventListener('beforeprint', () => { printing = true; syncAnimation(); });
   window.addEventListener('afterprint', () => { printing = false; resize(); syncAnimation(); });
   canvas.addEventListener('webglcontextlost', event => {
+    window.I3LAnalytics?.track('viewer_error', { model: selected, target: 'graphics_context', section: 'hardware' });
     event.preventDefault();
     stopRotation();
     placeholder.hidden = false;

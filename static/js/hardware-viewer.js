@@ -16,6 +16,7 @@
       const { createHardwareViewer } = await import('./hardware-scene.js');
       await createHardwareViewer(root);
     } catch (error) {
+      window.I3LAnalytics?.track('viewer_error', { target: 'startup', section: 'hardware' });
       root.dataset.state = 'error';
       status.textContent = 'The 3D viewer could not start. Use the hardware overview below or download a model to explore it.';
       button.hidden = false;
