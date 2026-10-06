@@ -27,8 +27,11 @@
   <link rel="stylesheet" href="./static/css/index.css">
   <link rel="stylesheet" href="./static/css/interactive-figures.css">
   <link rel="stylesheet" href="./static/css/hardware-viewer.css">
+  <link rel="stylesheet" href="./static/css/takeovers.css">
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script defer src="./static/js/figure-config.js"></script>
+  <script defer src="./static/js/takeover-data.js"></script>
+  <script defer src="./static/js/takeovers.js"></script>
   <script defer src="./static/js/interactive-figures.js"></script>
   <script defer src="./static/js/analytics.js" data-endpoint="https://i3l-metrics.i3l-anonymous.workers.dev/collect"></script>
   <script defer src="./static/js/hardware-viewer.js"></script>
@@ -356,6 +359,58 @@
       Round 4, while a peak remains around basket pickup. On Breakfast Bowls, intervention during drawer opening and bread
       placement diminishes, while late-stage intervention remains around bowl placement.
     </p>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 id="takeovers-title" class="title is-3">Watch the Takeovers</h2>
+    <div id="takeovers" aria-labelledby="takeovers-title">
+      <div class="content has-text-justified">
+        <p>
+          One Round 1 correction-collection episode per task, replayed from the released datasets. The policy drives the
+          robot until the operator takes over through JoyLo+; the badge and timeline show who is in control at every frame,
+          taken directly from each episode's intervention labels. The upper timeline row marks the task's subtasks.
+          Click or drag the timeline to seek.
+        </p>
+      </div>
+      <div class="takeover-tabs" role="tablist" aria-label="Task"></div>
+      <div class="takeover-player">
+      <div class="takeover-stage">
+        <video class="takeover-video" muted loop playsinline preload="metadata"
+               aria-label="Correction-collection episode with policy and human takeover segments"></video>
+        <span class="takeover-badge" aria-hidden="true"><span class="takeover-badge-text">Policy</span></span>
+        <span class="takeover-camera" style="left: 0.4rem;">Head camera</span>
+        <span class="takeover-camera" style="left: calc(66.67% + 0.4rem); bottom: calc(50% + 0.4rem);">Left wrist</span>
+        <span class="takeover-camera" style="left: calc(66.67% + 0.4rem);">Right wrist</span>
+      </div>
+      <div class="takeover-controls">
+        <button type="button" class="takeover-play" aria-pressed="false" aria-label="Play"></button>
+        <span class="takeover-speed" role="group" aria-label="Playback speed">
+          <button type="button" data-speed="1" aria-pressed="false">1×</button>
+          <button type="button" data-speed="2" aria-pressed="true">2×</button>
+          <button type="button" data-speed="4" aria-pressed="false">4×</button>
+        </span>
+        <span class="takeover-clock">0:00 / 0:00</span>
+        <button type="button" class="takeover-next">Next takeover ⇥</button>
+      </div>
+      <div class="takeover-timeline" role="slider" tabindex="0" aria-label="Episode timeline"
+           aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+        <span class="takeover-row-label">Subtask</span>
+        <div class="takeover-row takeover-row-subtasks"></div>
+        <span class="takeover-row-label">Control</span>
+        <div class="takeover-row takeover-row-control"></div>
+        <div class="takeover-track-overlay"><div class="takeover-playhead"></div></div>
+      </div>
+      <div class="takeover-meta">
+        <span class="takeover-subtask-now" aria-live="polite"></span>
+        <span class="takeover-legend"><span>Policy</span><span class="is-takeover">Human takeover</span></span>
+      </div>
+      </div>
+      <p class="figure-caption takeover-summary"></p>
+      <p class="figure-caption">Source: <a class="takeover-source" href="https://huggingface.co/I3L"></a>.
+        Subtask boundaries are annotated by hand from the camera streams.</p>
+    </div>
   </div>
 </div>
 
