@@ -122,9 +122,31 @@
   cursor: pointer;
 }
 
-.takeover-play { width: 2.2rem; }
-.takeover-play::before { content: "\25B6"; }
-.takeover-play[aria-pressed="true"]::before { content: "\275A\275A"; letter-spacing: -0.15em; }
+/* Icons drawn in CSS: a triangle for play, two bars for pause. */
+.takeover-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 1.75rem;
+}
+.takeover-play::before {
+  content: "";
+  box-sizing: border-box;
+  width: 0;
+  height: 0;
+  margin-left: 0.15rem;
+  border-style: solid;
+  border-width: 0.4rem 0 0.4rem 0.65rem;
+  border-color: transparent transparent transparent currentColor;
+}
+.takeover-play[aria-pressed="true"]::before {
+  width: 0.6rem;
+  height: 0.75rem;
+  margin-left: 0;
+  border-width: 0 0.2rem;
+  border-color: currentColor;
+}
 
 .takeover-speed { display: inline-flex; }
 .takeover-speed button { border-radius: 0; margin-left: -1px; }
