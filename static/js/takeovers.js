@@ -103,12 +103,12 @@
     fitLabels();
   }
 
-  // Hide subtask labels that do not fit their segment; the current subtask is always named below.
+  // Labels may wrap to two lines; hide those that still do not fit their segment; the current subtask is always named below.
   function fitLabels() {
     for (const seg of subtaskRow.children) {
       const label = seg.firstChild;
       seg.classList.remove('is-cramped');
-      if (label.scrollWidth > seg.clientWidth - 8) seg.classList.add('is-cramped');
+      if (label.scrollWidth > seg.clientWidth || label.scrollHeight > seg.clientHeight) seg.classList.add('is-cramped');
     }
   }
 

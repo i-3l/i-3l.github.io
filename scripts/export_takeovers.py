@@ -25,38 +25,38 @@ ROUNDS = ["base-int-1", "hg-int-2", "hg-int-3", "hg-int-4"]
 CAMERAS = ["head", "left_wrist", "right_wrist"]
 TAKEOVER = 2  # int_state: 0 human demo, 1 pre-intervention, 2 takeover, 3 autonomous
 
-# Subtask starts are frame indices chosen by inspecting the head and wrist cameras, snapped to
-# gripper open/close and base-motion events in the action stream. Each subtask ends where the next begins.
+# Subtask names follow the stage labels in Fig. 5 of the paper. Each subtask ends where the next begins.
+# Books, bread and popcorn starts are the human annotations made with IIIL/scripts/data/annotate_subtask.py
+# (2026_arxiv_IIIL_paper/results/Data/Annotation/wensi-ai/<dataset>/subtask_annotations.json). Radio and the
+# sim task have no human annotations for these episodes; their starts were chosen from the camera streams.
 TASKS = [
     {
         "key": "books", "short": "Books", "dataset": "books", "episode": 5,
         "title": "Boxing Books up for Storage", "setting": "R1 Pro · real world",
-        "subtasks": [(0, "Pick up basket"), (240, "Place basket on table"), (720, "Grasp first book"),
-                     (960, "Grasp second book"), (1410, "Put books in basket")],
+        "subtasks": [(0, "Pick basket"), (433, "Place basket"), (712, "Pick book 1"),
+                     (1047, "Pick book 2"), (1504, "Place books")],
     },
     {
         "key": "bread", "short": "Breakfast Bowls", "dataset": "bread", "episode": 1,
         "title": "Prepare Make-Ahead Breakfast Bowls", "setting": "R1 Pro · real world",
-        "subtasks": [(0, "Open drawer"), (460, "Retrieve bowl"), (1000, "Add first bread"),
-                     (1360, "Add second bread"), (1600, "Place bowl on right")],
+        "subtasks": [(0, "Open drawer"), (519, "Pick bowl"), (697, "Close drawer"),
+                     (988, "Put bread 1"), (1378, "Put bread 2"), (1622, "Place bowl")],
     },
     {
         "key": "popcorn", "short": "Popcorn", "dataset": "popcorn", "episode": 17,
         "title": "Make Microwave Popcorn", "setting": "R1 Pro · real world",
-        "subtasks": [(0, "Go to shelf"), (156, "Grasp bag"), (300, "Carry to microwave"),
-                     (590, "Open microwave"), (800, "Place bag inside")],
+        "subtasks": [(0, "Pick popcorn"), (420, "Open microwave"), (776, "Place popcorn"),
+                     (996, "Close microwave")],
     },
     {
         "key": "radio", "short": "Radio", "dataset": "radio", "episode": 18,
         "title": "Turning on Radio", "setting": "R1 Pro · real world",
-        "subtasks": [(0, "Approach table"), (330, "Grasp radio"), (460, "Lift radio"),
-                     (560, "Poke orange button")],
+        "subtasks": [(0, "Navigate to radio"), (330, "Pick radio"), (560, "Press button")],
     },
     {
         "key": "fridge_radio", "short": "Fridge + Radio (sim)", "dataset": "or", "episode": 7,
         "title": "Open Fridge and Pick Up Radio", "setting": "R1 Pro · BEHAVIOR simulation",
-        "subtasks": [(0, "Reach handle"), (60, "Open fridge door"), (255, "Go to table"),
-                     (405, "Grasp radio")],
+        "subtasks": [(0, "Open fridge"), (255, "Navigate"), (405, "Pick radio")],
     },
 ]
 

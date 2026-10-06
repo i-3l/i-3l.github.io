@@ -23,28 +23,28 @@ window.I3L_TAKEOVERS = [
   ],
   "subtasks": [
    {
-    "label": "Pick up basket",
+    "label": "Pick basket",
     "start": 0,
-    "end": 240
+    "end": 433
    },
    {
-    "label": "Place basket on table",
-    "start": 240,
-    "end": 720
+    "label": "Place basket",
+    "start": 433,
+    "end": 712
    },
    {
-    "label": "Grasp first book",
-    "start": 720,
-    "end": 960
+    "label": "Pick book 1",
+    "start": 712,
+    "end": 1047
    },
    {
-    "label": "Grasp second book",
-    "start": 960,
-    "end": 1410
+    "label": "Pick book 2",
+    "start": 1047,
+    "end": 1504
    },
    {
-    "label": "Put books in basket",
-    "start": 1410,
+    "label": "Place books",
+    "start": 1504,
     "end": 2027
    }
   ],
@@ -100,26 +100,31 @@ window.I3L_TAKEOVERS = [
    {
     "label": "Open drawer",
     "start": 0,
-    "end": 460
+    "end": 519
    },
    {
-    "label": "Retrieve bowl",
-    "start": 460,
-    "end": 1000
+    "label": "Pick bowl",
+    "start": 519,
+    "end": 697
    },
    {
-    "label": "Add first bread",
-    "start": 1000,
-    "end": 1360
+    "label": "Close drawer",
+    "start": 697,
+    "end": 988
    },
    {
-    "label": "Add second bread",
-    "start": 1360,
-    "end": 1600
+    "label": "Put bread 1",
+    "start": 988,
+    "end": 1378
    },
    {
-    "label": "Place bowl on right",
-    "start": 1600,
+    "label": "Put bread 2",
+    "start": 1378,
+    "end": 1622
+   },
+   {
+    "label": "Place bowl",
+    "start": 1622,
     "end": 1910
    }
   ],
@@ -173,28 +178,23 @@ window.I3L_TAKEOVERS = [
   ],
   "subtasks": [
    {
-    "label": "Go to shelf",
+    "label": "Pick popcorn",
     "start": 0,
-    "end": 156
-   },
-   {
-    "label": "Grasp bag",
-    "start": 156,
-    "end": 300
-   },
-   {
-    "label": "Carry to microwave",
-    "start": 300,
-    "end": 590
+    "end": 420
    },
    {
     "label": "Open microwave",
-    "start": 590,
-    "end": 800
+    "start": 420,
+    "end": 776
    },
    {
-    "label": "Place bag inside",
-    "start": 800,
+    "label": "Place popcorn",
+    "start": 776,
+    "end": 996
+   },
+   {
+    "label": "Close microwave",
+    "start": 996,
     "end": 1101
    }
   ],
@@ -248,22 +248,17 @@ window.I3L_TAKEOVERS = [
   ],
   "subtasks": [
    {
-    "label": "Approach table",
+    "label": "Navigate to radio",
     "start": 0,
     "end": 330
    },
    {
-    "label": "Grasp radio",
+    "label": "Pick radio",
     "start": 330,
-    "end": 460
-   },
-   {
-    "label": "Lift radio",
-    "start": 460,
     "end": 560
    },
    {
-    "label": "Poke orange button",
+    "label": "Press button",
     "start": 560,
     "end": 700
    }
@@ -314,22 +309,17 @@ window.I3L_TAKEOVERS = [
   ],
   "subtasks": [
    {
-    "label": "Reach handle",
+    "label": "Open fridge",
     "start": 0,
-    "end": 60
-   },
-   {
-    "label": "Open fridge door",
-    "start": 60,
     "end": 255
    },
    {
-    "label": "Go to table",
+    "label": "Navigate",
     "start": 255,
     "end": 405
    },
    {
-    "label": "Grasp radio",
+    "label": "Pick radio",
     "start": 405,
     "end": 570
    }

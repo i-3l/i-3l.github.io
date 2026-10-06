@@ -202,7 +202,7 @@
 
 .takeover-subtask:first-child { border-radius: 3px 0 0 3px; }
 .takeover-subtask:last-child { border-radius: 0 3px 3px 0; border-right: 0; }
-.takeover-subtask span { white-space: nowrap; padding: 0 0.3rem; }
+.takeover-subtask span { padding: 0 0.1rem; line-height: 1.05; text-align: center; }
 .takeover-subtask.is-cramped span { visibility: hidden; }
 .takeover-subtask.is-current { background: var(--subtask-current); font-weight: 600; }
 
