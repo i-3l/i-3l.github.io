@@ -37,14 +37,14 @@ This serves your local copy; publishing changes to GitHub Pages is a separate st
 ## Interactive figures
 
 Every figure follows one pattern: **hover, tap, or Tab to part of a figure** to highlight it
-(dimming the rest) and show its details in a tooltip beside the pointer. Specific numbers live in
+and show its details in a tooltip beside the pointer. Specific numbers live in
 these tooltips, not in the surrounding text.
 
 - **Plots drawn from data** — intervention trends, whole-body activation shares, and the operator
   study are rendered as SVG from the `chart` entries in `static/js/figure-config.js`. Hovering a
   task, operator, or body part highlights it in every panel; legend entries highlight on hover and
   pin on click. The original PNG stays in the page as the no-JavaScript and print fallback.
-- **Photo figures** — the teaser, hardware, tasks, and task-stage figures use spotlight regions from
+- **Photo figures** — the teaser, hardware, tasks, and task-stage figures outline the hovered region with an orange border (the rest of the image is not dimmed), using hotspots from
   the `hotspots` arrays. Each entry is
   `["Title", [left, top, width, height], "Short note shown in the tooltip."]`, with bounds in
   normalized image coordinates (0–1).
