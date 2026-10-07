@@ -60,10 +60,10 @@ TASKS = [
                      (1047, "Pick book 2"), (1504, "Place books")],
     },
     {
-        "key": "bread", "short": "Breakfast Bowls", "dataset": "bread", "episode": 23,
+        "key": "bread", "short": "Breakfast Bowls", "dataset": "bread", "episode": 14,
         "title": "Prepare Make-Ahead Breakfast Bowls", "setting": "R1 Pro · real world",
-        "subtasks": [(0, "Open drawer"), (615, "Pick bowl"), (975, "Close drawer"), (1285, "Put bread 1"),
-                     (1625, "Put bread 2"), (1910, "Place bowl")],
+        "subtasks": [(0, "Open drawer"), (520, "Pick bowl"), (740, "Close drawer"), (980, "Put bread 1"),
+                     (1525, "Put bread 2"), (2040, "Place bowl")],
         # The bowls cameras were under-exposed; lift the mid-tones to match the other clips.
         "gamma": 1.25,
     },
