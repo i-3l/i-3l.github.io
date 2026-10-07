@@ -1,8 +1,8 @@
 /* Scoped additions preserve the paper website's typography and orange accent. */
 .interactive-figure { margin: 0; }
-.figure-canvas { position: relative; border-radius: 6px; overflow: hidden; }
+/* Not clipped, so outlines of regions at the image edge stay fully visible. */
+.figure-canvas { position: relative; }
 .figure-canvas > img { display: block; margin-bottom: 0; }
-.figure-canvas.has-chart { overflow: visible; }
 .figure-canvas.has-chart > .chart-fallback { display: none; }
 
 /* Hotspots: the active region gets an orange border; the rest of the image is left as is. */

@@ -33,11 +33,11 @@
       source: [2, 3],
       hotspots: [
         ["Actuated leader arms", [0, 0, 0.367, 0.76], "Track the policy during autonomy; gravity-compensated for hand guidance during correction."],
-        ["Copper touch electrodes", [0.375, 0.12, 0.103, 0.55], "Grasping the grip requests takeover."],
-        ["Touch sensing", [0.48, 0.12, 0.108, 0.55], "A capacitive-sensing board and microcontroller report touch state to the host."],
+        ["Copper touch electrodes", [0.374, 0.135, 0.110, 0.535], "Grasping the grip requests takeover."],
+        ["Touch sensing", [0.4905, 0.098, 0.0995, 0.57], "A capacitive-sensing board and microcontroller report touch state to the host."],
         ["Hands off → hands on", [0.589, 0.06, 0.16, 0.59], "Touch switches the leaders from policy tracking to hand guidance."],
         ["Whole-body gate", [0.62, 0.72, 0.117, 0.27], "One takeover hands over arms, torso, base, and grippers."],
-        ["Franka and R1 Pro", [0.764, 0, 0.236, 0.79], "The same interaction supports single-arm and bimanual whole-body control."]
+        ["Franka and R1 Pro", [0.766, 0, 0.236, 0.79], "The same interaction supports single-arm and bimanual whole-body control."]
       ]
     },
     // Task figures: hovering outlines a task; clicking it highlights that task across the page.
@@ -58,14 +58,14 @@
     "correction.png": {
       source: [5, 6],
       tasks: [
-        ["Prepare Make-Ahead Breakfast Bowls", [0.014, 0, 0.486, 0.236]],
-        ["Boxing Books up for Storage", [0.51, 0, 0.49, 0.236]],
-        ["Mug Hanging", [0.014, 0.239, 0.486, 0.25]],
-        ["Peg Insertion", [0.51, 0.239, 0.49, 0.25]],
-        ["Make Microwave Popcorn", [0.014, 0.49, 0.486, 0.245]],
-        ["Turning on Radio", [0.51, 0.49, 0.49, 0.245]],
-        ["Pick-and-Place Strawberries", [0.014, 0.736, 0.486, 0.24]],
-        ["Open Fridge and Pick Up Radio", [0.51, 0.736, 0.49, 0.24]]
+        ["Prepare Make-Ahead Breakfast Bowls", [0.014, -0.008, 0.486, 0.244]],
+        ["Boxing Books up for Storage", [0.51, -0.008, 0.49, 0.244]],
+        ["Mug Hanging", [0.014, 0.2295, 0.486, 0.2595]],
+        ["Peg Insertion", [0.51, 0.2295, 0.49, 0.2595]],
+        ["Make Microwave Popcorn", [0.014, 0.4835, 0.486, 0.2515]],
+        ["Turning on Radio", [0.51, 0.4835, 0.49, 0.2515]],
+        ["Pick-and-Place Strawberries", [0.014, 0.7345, 0.486, 0.2415]],
+        ["Open Fridge and Pick Up Radio", [0.51, 0.7345, 0.49, 0.2415]]
       ]
     },
     "intervention_trends.png": {
