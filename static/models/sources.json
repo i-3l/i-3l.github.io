@@ -85,5 +85,16 @@
     },
     "output_sha256": "4dd93b3b7547e9db3ac5f7d4c88c048042e55d8cff5836a576dbb81b8e2a9b98",
     "bytes": 2184316
+  },
+  "r1pro_robot": {
+    "source": "r1pro_soft_gripper.usda",
+    "source_sha256": {
+      "r1pro_soft_gripper.usda": "fe339f2ad768b5a1b88a00824801f40488526049b636695589bac05f6fbb9454"
+    },
+    "generator": "scripts/export_r1pro.py (Blender) + gltfpack",
+    "triangles": 100055,
+    "output": "static/models/r1pro.glb",
+    "output_sha256": "34fcd4a194a14b6995d97e0f70cccce31a89de101d5d64dd7fc81dc5989ac4d4",
+    "bytes": 318268
   }
 }

@@ -3,6 +3,7 @@
 For one Round 1 collection episode per task this writes
   static/videos/takeovers/<key>.mp4   head camera (2x) beside the stacked wrist cameras, H.264
   static/videos/takeovers/<key>.jpg   poster frame
+  static/videos/takeovers/<key>.joints.bin   Int16 joint track for the 3D robot view (see JOINT_COLUMNS)
 and static/js/takeover-data.js with the takeover segments (int_state == 2), the hand-annotated
 subtask boundaries below, and per-round takeover statistics over all 25 episodes of each round.
 
@@ -24,6 +25,27 @@ DATA_JS = ROOT / "static" / "js" / "takeover-data.js"
 ROUNDS = ["base-int-1", "hg-int-2", "hg-int-3", "hg-int-4"]
 CAMERAS = ["head", "left_wrist", "right_wrist"]
 TAKEOVER = 2  # int_state: 0 human demo, 1 pre-intervention, 2 takeover, 3 autonomous
+
+# Joint tracks: one Int16 row per frame, values multiplied by JOINT_SCALE (radians, or metres of finger travel).
+# Columns: torso 1-4, left arm 1-7, right arm 1-7, left finger travel, right finger travel (0.05 m = open).
+JOINT_COLUMNS = 20
+JOINT_SCALE = 5000
+
+
+def joint_track(parquet, sim):
+    state = np.stack(pd.read_parquet(parquet, columns=["observation.state"])["observation.state"].to_numpy())
+    if sim:
+        # OmniGibson proprio: 6 virtual base joints, 4 torso, arm joints interleaved left/right, then the
+        # finger joints grouped per gripper (left pair, right pair), all in metres.
+        parts = [state[:, 6:10], state[:, 10:24:2], state[:, 11:24:2], state[:, 24:25], state[:, 26:27]]
+    else:
+        # Real robot (IIIL action order): base 3, torso 4, left arm 7, left gripper, right arm 7, right gripper.
+        # Grippers are in [-1 (open), 1 (closed)]; convert to finger travel.
+        travel = lambda g: 0.05 * (1 - g) / 2
+        parts = [state[:, 3:7], state[:, 7:14], state[:, 15:22], travel(state[:, 14:15]), travel(state[:, 22:23])]
+    track = np.concatenate(parts, axis=1)
+    assert track.shape[1] == JOINT_COLUMNS
+    return np.round(track * JOINT_SCALE).astype("<i2")
 
 # Subtask names follow the stage labels in Fig. 5 of the paper. Each subtask ends where the next begins.
 # Books, bread and popcorn starts are the human annotations made with IIIL/scripts/data/annotate_subtask.py
@@ -116,12 +138,16 @@ def main():
         frames = len(states)
         starts = [s for s, _ in task["subtasks"]]
         encode(cache, dataset, episode, task["key"], fps)
+        track = joint_track(local / f"data/chunk-000/episode_{episode:06d}.parquet", sim="simulation" in task["setting"])
+        (VIDEO_DIR / f"{task['key']}.joints.bin").write_bytes(track.tobytes())
         exported.append({
             "key": task["key"], "short": task["short"], "title": task["title"], "setting": task["setting"],
             "source": f"I3L/{dataset}-base-int-1-25", "episode": episode,
             "fps": fps, "frames": frames,
             "video": f"./static/videos/takeovers/{task['key']}.mp4",
             "poster": f"./static/videos/takeovers/{task['key']}.jpg",
+            "joints": {"file": f"./static/videos/takeovers/{task['key']}.joints.bin",
+                       "columns": JOINT_COLUMNS, "scale": JOINT_SCALE},
             "takeovers": runs(states == TAKEOVER),
             "subtasks": [{"label": label, "start": s, "end": e}
                          for (s, label), e in zip(task["subtasks"], starts[1:] + [frames])],

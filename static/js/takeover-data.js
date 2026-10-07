@@ -11,6 +11,11 @@ window.I3L_TAKEOVERS = [
   "frames": 2027,
   "video": "./static/videos/takeovers/books.mp4",
   "poster": "./static/videos/takeovers/books.jpg",
+  "joints": {
+   "file": "./static/videos/takeovers/books.joints.bin",
+   "columns": 20,
+   "scale": 5000
+  },
   "takeovers": [
    [
     860,
@@ -86,6 +91,11 @@ window.I3L_TAKEOVERS = [
   "frames": 1910,
   "video": "./static/videos/takeovers/bread.mp4",
   "poster": "./static/videos/takeovers/bread.jpg",
+  "joints": {
+   "file": "./static/videos/takeovers/bread.joints.bin",
+   "columns": 20,
+   "scale": 5000
+  },
   "takeovers": [
    [
     264,
@@ -166,6 +176,11 @@ window.I3L_TAKEOVERS = [
   "frames": 1101,
   "video": "./static/videos/takeovers/popcorn.mp4",
   "poster": "./static/videos/takeovers/popcorn.jpg",
+  "joints": {
+   "file": "./static/videos/takeovers/popcorn.joints.bin",
+   "columns": 20,
+   "scale": 5000
+  },
   "takeovers": [
    [
     156,
@@ -236,6 +251,11 @@ window.I3L_TAKEOVERS = [
   "frames": 700,
   "video": "./static/videos/takeovers/radio.mp4",
   "poster": "./static/videos/takeovers/radio.jpg",
+  "joints": {
+   "file": "./static/videos/takeovers/radio.joints.bin",
+   "columns": 20,
+   "scale": 5000
+  },
   "takeovers": [
    [
     369,
@@ -301,6 +321,11 @@ window.I3L_TAKEOVERS = [
   "frames": 570,
   "video": "./static/videos/takeovers/fridge_radio.mp4",
   "poster": "./static/videos/takeovers/fridge_radio.jpg",
+  "joints": {
+   "file": "./static/videos/takeovers/fridge_radio.joints.bin",
+   "columns": 20,
+   "scale": 5000
+  },
   "takeovers": [
    [
     407,

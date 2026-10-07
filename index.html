@@ -369,20 +369,25 @@
       <div class="content has-text-justified">
         <p>
           One Round 1 correction-collection episode per task, replayed from the released datasets. The policy drives the
-          robot until the operator takes over through JoyLo+; the badge and timeline show who is in control at every frame,
-          taken directly from each episode's intervention labels. The upper timeline row marks the task's subtasks.
-          Click or drag the timeline to seek.
+          robot until the operator takes over through JoyLo+; the badge, the robot's floor disc and the timeline show who
+          is in control at every frame, and the 3D robot follows the recorded joint state. Click or drag the timeline to seek.
         </p>
       </div>
       <div class="takeover-tabs" role="tablist" aria-label="Task"></div>
       <div class="takeover-player">
-      <div class="takeover-stage">
-        <video class="takeover-video" muted loop playsinline preload="metadata"
-               aria-label="Correction-collection episode with policy and human takeover segments"></video>
-        <span class="takeover-badge" aria-hidden="true"><span class="takeover-badge-text">Policy</span></span>
-        <span class="takeover-camera" style="left: 0.4rem;">Head camera</span>
-        <span class="takeover-camera" style="left: calc(66.67% + 0.4rem); bottom: calc(50% + 0.4rem);">Left wrist</span>
-        <span class="takeover-camera" style="left: calc(66.67% + 0.4rem);">Right wrist</span>
+      <div class="takeover-stage-row">
+        <div class="takeover-stage">
+          <video class="takeover-video" muted loop playsinline preload="metadata"
+                 aria-label="Correction-collection episode with policy and human takeover segments"></video>
+          <span class="takeover-badge" aria-hidden="true"><span class="takeover-badge-text">Policy</span></span>
+          <span class="takeover-camera" style="left: 0.4rem;">Head camera</span>
+          <span class="takeover-camera" style="left: calc(66.67% + 0.4rem); bottom: calc(50% + 0.4rem);">Left wrist</span>
+          <span class="takeover-camera" style="left: calc(66.67% + 0.4rem);">Right wrist</span>
+        </div>
+        <div class="takeover-robot" data-state="idle" aria-label="3D view of the robot's recorded joint state">
+          <span class="takeover-robot-label">3D pose · drag to orbit</span>
+          <button type="button" class="takeover-robot-reset" hidden>Reset view</button>
+        </div>
       </div>
       <div class="takeover-controls">
         <button type="button" class="takeover-play" aria-pressed="false" aria-label="Play"></button>
@@ -392,7 +397,7 @@
           <button type="button" data-speed="4" aria-pressed="false">4×</button>
         </span>
         <span class="takeover-clock">0:00 / 0:00</span>
-        <button type="button" class="takeover-next">Next takeover ⇥</button>
+        <span class="takeover-legend" aria-hidden="true"><span>Policy</span><span class="is-takeover">Human takeover</span></span>
       </div>
       <div class="takeover-timeline" role="slider" tabindex="0" aria-label="Episode timeline"
            aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
@@ -402,14 +407,7 @@
         <div class="takeover-row takeover-row-control"></div>
         <div class="takeover-track-overlay"><div class="takeover-playhead"></div></div>
       </div>
-      <div class="takeover-meta">
-        <span class="takeover-subtask-now" aria-live="polite"></span>
-        <span class="takeover-legend"><span>Policy</span><span class="is-takeover">Human takeover</span></span>
       </div>
-      </div>
-      <p class="figure-caption takeover-summary"></p>
-      <p class="figure-caption">Source: <a class="takeover-source" href="https://huggingface.co/I3L"></a>.
-        Subtask names follow Fig. 5 of the paper; boundaries come from the human subtask annotations (Books, Breakfast Bowls, Popcorn) or were marked from the camera streams (Radio, Fridge + Radio).</p>
     </div>
   </div>
 </div>

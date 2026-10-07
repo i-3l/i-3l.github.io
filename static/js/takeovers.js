@@ -1,6 +1,8 @@
 // Takeover timeline: one Round 1 collection episode per task, with a timeline built from the
 // dataset's int_state labels (policy vs. human takeover) and annotated subtasks. The playhead,
-// live status badge, and current subtask follow the video; click or drag the timeline to seek.
+// live status badge, and a 3D robot posed from the recorded joint state follow the video; click or
+// drag the timeline to seek. The 3D view (takeover-robot.js and the model) loads only when the
+// section is near the viewport and the screen is wide enough to show it.
 (function () {
   'use strict';
   const root = document.getElementById('takeovers');
@@ -12,22 +14,20 @@
   const tabs = $('.takeover-tabs');
   const badge = $('.takeover-badge');
   const playButton = $('.takeover-play');
-  const nextButton = $('.takeover-next');
+  const robotHost = $('.takeover-robot');
   const speedButtons = [...root.querySelectorAll('button[data-speed]')];
   const clock = $('.takeover-clock');
   const timeline = $('.takeover-timeline');
   const subtaskRow = $('.takeover-row-subtasks');
   const controlRow = $('.takeover-row-control');
   const playhead = $('.takeover-playhead');
-  const subtaskNow = $('.takeover-subtask-now');
-  const summary = $('.takeover-summary');
-  const source = $('.takeover-source');
 
   let task = tasks[0];
   let speed = 2;
   let lastFrame = -1;
   let userPaused = false;
   let visible = false;
+  let robot = null;
 
   const pct = frame => `${(100 * frame / task.frames).toFixed(3)}%`;
   const fmt = seconds => {
@@ -75,8 +75,8 @@
     video.src = task.video;
     video.playbackRate = speed;
     buildTimeline();
-    describe();
     update();
+    if (robot) robot.setTask(task).then(() => { if (robot) robot.update(Math.max(0, currentFrame()), inTakeover(currentFrame()) >= 0); });
     if (visible && !userPaused) video.play().catch(() => {});
   }
 
@@ -112,20 +112,6 @@
     }
   }
 
-  function describe() {
-    const totalTakeover = task.takeovers.reduce((sum, [a, b]) => sum + b - a, 0);
-    const first = task.rounds[0];
-    const last = task.rounds[task.rounds.length - 1];
-    summary.textContent =
-      `This episode: ${task.takeovers.length} takeover${task.takeovers.length === 1 ? '' : 's'}, ` +
-      `${(totalTakeover / task.fps).toFixed(1)} s of ${(task.frames / task.fps).toFixed(1)} s ` +
-      `(${percent(totalTakeover / task.frames)}). Across all ${first.episodes} collection episodes per round, ` +
-      `time under takeover goes from ${percent(first.takeoverFraction)} in Round 1 to ` +
-      `${percent(last.takeoverFraction)} in Round ${last.round}.`;
-    source.textContent = `${task.title} · ${task.setting} · ${task.source}, episode ${task.episode}`;
-    source.href = `https://huggingface.co/datasets/${task.source}`;
-  }
-
   // Playback state --------------------------------------------------------------------------
   function update() {
     const frame = Math.max(0, currentFrame());
@@ -137,7 +123,7 @@
       badge.querySelector('.takeover-badge-text').textContent = takeover ? 'Human takeover' : 'Policy';
       const s = task.subtasks.findIndex(x => frame >= x.start && frame < x.end);
       [...subtaskRow.children].forEach((seg, i) => seg.classList.toggle('is-current', i === s));
-      subtaskNow.textContent = s >= 0 ? `Subtask ${s + 1}/${task.subtasks.length}: ${task.subtasks[s].label}` : '';
+      if (robot) robot.update(frame, takeover);
       timeline.setAttribute('aria-valuenow', String(Math.round(video.currentTime)));
       timeline.setAttribute('aria-valuetext',
         `${fmt(video.currentTime)}, ${takeover ? 'human takeover' : 'policy'}${s >= 0 ? `, ${task.subtasks[s].label}` : ''}`);
@@ -174,17 +160,6 @@
       speedButtons.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     });
   }
-
-  // Jump to a little before the next takeover (wrapping), so its onset is visible.
-  nextButton.addEventListener('click', () => {
-    const frame = currentFrame();
-    const lead = Math.round(task.fps);
-    const next = task.takeovers.find(([a]) => a - lead > frame + 1) || task.takeovers[0];
-    if (!next) return;
-    video.currentTime = Math.max(0, next[0] - lead) / task.fps;
-    userPaused = false;
-    video.play().catch(() => {});
-  });
 
   // Seeking ---------------------------------------------------------------------------------
   function seekTo(clientX) {
@@ -223,8 +198,41 @@
         visible = entry.isIntersecting && entry.intersectionRatio >= 0.35;
         if (visible && !userPaused) video.play().catch(() => {});
         else if (!visible && !video.paused) video.pause();
+        if (robot) robot.setVisible(entry.isIntersecting);
       }
     }, { threshold: [0, 0.35, 0.6] }).observe(video);
+  }
+
+  // 3D robot view: fetched once the section is near, and only where the panel is shown ---------
+  const styles = getComputedStyle(root);
+  async function startRobot() {
+    if (robotHost.dataset.state !== 'idle') return;
+    robotHost.dataset.state = 'loading';
+    try {
+      const { createRobotView } = await import('./takeover-robot.js');
+      const view = await createRobotView(robotHost, {
+        modelUrl: './static/models/r1pro.glb',
+        policyColor: styles.getPropertyValue('--policy').trim() || '#5b7db1',
+        takeoverColor: styles.getPropertyValue('--takeover').trim() || '#C45B28',
+      });
+      await view.setTask(task);
+      robot = view;
+      robotHost.dataset.state = 'ready';
+      const frame = Math.max(0, currentFrame());
+      robot.update(frame, inTakeover(frame) >= 0);
+    } catch (error) {
+      robotHost.dataset.state = 'error';
+      root.classList.add('no-robot');
+      console.warn('Takeover robot view unavailable:', error);
+    }
+  }
+  if (robotHost && 'IntersectionObserver' in window && window.matchMedia('(min-width: 601px)').matches) {
+    const near = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) { near.disconnect(); startRobot(); }
+    }, { rootMargin: '250px' });
+    near.observe(root);
+  } else if (robotHost) {
+    root.classList.add('no-robot');
   }
   window.addEventListener('resize', fitLabels);
 

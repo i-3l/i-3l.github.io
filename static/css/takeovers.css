@@ -11,8 +11,61 @@
 }
 
 .takeover-player {
-  max-width: 760px;
+  max-width: 960px;
   margin: 0 auto;
+}
+
+/* Video beside the 3D robot; the controls and timeline below span both. */
+.takeover-stage-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 12px;
+  align-items: stretch;
+}
+#takeovers.no-robot .takeover-stage-row { grid-template-columns: minmax(0, 1fr); max-width: 760px; margin: 0 auto; }
+#takeovers.no-robot .takeover-robot { display: none; }
+
+.takeover-robot {
+  position: relative;
+  min-height: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f3f1ed;
+  background-image: radial-gradient(#d7d0c7 0.65px, transparent 0.65px);
+  background-size: 18px 18px;
+  touch-action: none;
+}
+.takeover-robot canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; cursor: grab; }
+.takeover-robot canvas:active { cursor: grabbing; }
+.takeover-robot[data-state="loading"]::after {
+  content: "Loading robot…";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.takeover-robot-label {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.45rem;
+  font-size: 0.7rem;
+  color: #70665d;
+  pointer-events: none;
+}
+.takeover-robot-reset {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  cursor: pointer;
 }
 
 .takeover-tabs {
@@ -155,7 +208,7 @@
 .takeover-speed button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 
 .takeover-clock { font-variant-numeric: tabular-nums; }
-.takeover-next { margin-left: auto; }
+.takeover-controls .takeover-legend { margin-left: auto; }
 
 .takeover-timeline {
   position: relative;
@@ -241,18 +294,6 @@
   border-top-color: #111;
 }
 
-.takeover-meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.3rem 1rem;
-  margin-top: 0.6rem;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.takeover-subtask-now { font-weight: 600; color: var(--ink); min-height: 1.3em; }
-
 .takeover-legend { display: inline-flex; gap: 0.9rem; }
 .takeover-legend span::before {
   content: "";
@@ -266,13 +307,16 @@
 }
 .takeover-legend .is-takeover::before { background: var(--takeover); }
 
-.takeover-summary { margin-top: 0.75rem; }
-.takeover-source { color: var(--muted); text-decoration: underline; text-decoration-color: var(--rule); }
+@media screen and (max-width: 768px) {
+  .takeover-stage-row { grid-template-columns: minmax(0, 1fr); }
+  .takeover-robot { aspect-ratio: 3 / 2; }
+}
 
 @media screen and (max-width: 600px) {
   .takeover-timeline { grid-template-columns: 0 1fr; }
   .takeover-row-label { visibility: hidden; }
   .takeover-track-overlay { left: 0; }
-  .takeover-next { margin-left: 0; }
+  .takeover-controls .takeover-legend { margin-left: 0; }
   .takeover-camera { display: none; }
+  .takeover-robot { display: none; }
 }
