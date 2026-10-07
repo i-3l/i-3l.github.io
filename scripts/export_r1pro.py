@@ -5,7 +5,8 @@ Runs inside Blender 4.5 (its Python ships with the USD importer and glTF exporte
         /path/to/r1pro_soft_gripper.usda static/models/r1pro.glb
 
 Steps: import the flattened stage, drop collision meshes, weld and decimate each link to a triangle budget,
-assign flat colours (the textures the USDA references are not shipped with it), rebuild the kinematic tree
+keep its materials (UV-mapped JPEG atlases from the materials/ folder beside the USDA, or the flat colour of
+untextured links), rebuild the kinematic tree
 from the joint prims, store each joint's axis and limits as glTF extras (read by static/js/takeover-robot.js),
 and export without normals: the CAD meshes have unreliable normals, so the viewer shades per face.
 If Node >= 18 is on PATH, the file is then quantised and meshopt-compressed with gltfpack (the website ships
@@ -53,7 +54,7 @@ for m in re.finditer(r'def Physics(Revolute|Prismatic|Fixed)Joint "([^"]+)"\s*(\
 # --- import -----------------------------------------------------------------------------------------
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.wm.usd_import(filepath=str(SRC), import_cameras=False, import_lights=False, import_materials=True,
-                      import_guide=False, import_proxy=False, import_render=True, read_mesh_uvs=False,
+                      import_guide=False, import_proxy=False, import_render=True, read_mesh_uvs=True,
                       import_subdiv=False, import_visible_only=False)
 for obj in list(bpy.data.objects):
     stem = obj.name.split(".")[0]
@@ -80,31 +81,47 @@ def budget(link):
     return 3000
 
 
-def material(name, rgb, roughness=0.55, metallic=0.0):
-    mat = bpy.data.materials.get(name) or bpy.data.materials.new(name)
+# Blender does not read the MDL shaders the USDA uses, so rebuild each material from the text layer:
+# OmniPBR materials sample a JPEG atlas (a few flat colour patches) through the mesh UVs; the two
+# OmniSurface materials are plain black and white.
+TEXTURES = {}
+for m in re.finditer(r'def Material "([^"]+)"(.*?)(?=\n        def Material|\n    }\n)', text, re.S):
+    found = re.search(r"inputs:diffuse_texture = @([^@]+)@", m.group(2))
+    if found:
+        TEXTURES[m.group(1)] = found.group(1)
+FLAT = {"black": (0.03, 0.03, 0.035, 1), "white": (0.9, 0.9, 0.88, 1)}
+images = {}
+
+
+def image(relative):
+    if relative not in images:
+        images[relative] = bpy.data.images.load(str((SRC.parent / relative).resolve()))
+    return images[relative]
+
+
+def rebuild_material(mat):
+    """Returns True when the material samples a texture."""
     mat.use_nodes = True
-    bsdf = mat.node_tree.nodes["Principled BSDF"]
-    bsdf.inputs["Base Color"].default_value = (*rgb, 1)
-    bsdf.inputs["Roughness"].default_value = roughness
-    bsdf.inputs["Metallic"].default_value = metallic
+    nodes, links = mat.node_tree.nodes, mat.node_tree.links
+    nodes.clear()
+    output = nodes.new("ShaderNodeOutputMaterial")
+    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
+    bsdf.inputs["Roughness"].default_value = 0.6
+    bsdf.inputs["Metallic"].default_value = 0.0
+    links.new(bsdf.outputs["BSDF"], output.inputs["Surface"])
+    if mat.name in TEXTURES:
+        tex = nodes.new("ShaderNodeTexImage")
+        tex.image = image(TEXTURES[mat.name])
+        links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+        return True
+    bsdf.inputs["Base Color"].default_value = FLAT.get(mat.name, (0.86, 0.85, 0.83, 1))
+    return False
+
+
+def fallback_material():
+    mat = bpy.data.materials.get("body") or bpy.data.materials.new("body")
+    rebuild_material(mat)
     return mat
-
-
-BODY = material("body", (0.86, 0.85, 0.83))
-DARK = material("dark", (0.12, 0.12, 0.13))
-GREY = material("grey", (0.45, 0.45, 0.47), 0.5, 0.2)
-
-
-def colour(link, usd_material):
-    if "black" in usd_material:
-        return DARK
-    if "white" in usd_material:
-        return BODY
-    if any(k in link for k in ("finger", "gripper", "realsense", "zed", "wheel", "steer")):
-        return DARK
-    if "arm" in link and link.endswith(("link1", "link3", "link5", "link7")):
-        return GREY
-    return BODY
 
 
 triangles = 0
@@ -125,11 +142,14 @@ for obj in list(bpy.data.objects):
         modifier = obj.modifiers.new("decimate", "DECIMATE")
         modifier.ratio = budget(link) / before
         bpy.ops.object.modifier_apply(modifier=modifier.name)
-    usd_material = obj.data.materials[0].name.lower() if obj.data.materials and obj.data.materials[0] else ""
-    obj.data.materials.clear()
-    obj.data.materials.append(colour(link, usd_material))
+    mat = obj.data.materials[0] if obj.data.materials else None
+    if mat is None:
+        obj.data.materials.append(fallback_material())
+        textured = False
+    else:
+        textured = rebuild_material(mat)
     triangles += len(obj.data.polygons)
-    print(f"{link:30s} {before:7d} -> {len(obj.data.polygons):6d}")
+    print(f"{link:30s} {before:7d} -> {len(obj.data.polygons):6d}  {'textured' if textured else 'flat'}")
 print(f"{triangles} triangles")
 
 # --- kinematic tree and joint extras ----------------------------------------------------------------
@@ -156,8 +176,9 @@ for joint in joints:
 raw = Path(tempfile.mkdtemp()) / "r1pro-raw.glb"
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.export_scene.gltf(filepath=str(raw), export_format="GLB", export_extras=True, export_yup=True,
-                          export_apply=True, export_texcoords=False, export_normals=False,
-                          export_materials="EXPORT", export_image_format="NONE", export_cameras=False,
+                          export_apply=True, export_texcoords=True, export_normals=False,
+                          export_materials="EXPORT", export_image_format="JPEG", export_jpeg_quality=80,
+                          export_cameras=False,
                           export_lights=False, export_animations=False, export_skins=False)
 OUT.parent.mkdir(parents=True, exist_ok=True)
 compressed = False
@@ -174,7 +195,9 @@ manifest_path = ROOT / "static" / "models" / "sources.json"
 if manifest_path.exists():
     manifest = json.loads(manifest_path.read_text())
     manifest["r1pro_robot"] = {
-        "source": SRC.name, "source_sha256": {SRC.name: hashlib.sha256(SRC.read_bytes()).hexdigest()},
+        "source": SRC.name,
+        "source_sha256": {name: hashlib.sha256((SRC.parent / name).read_bytes()).hexdigest()
+                          for name in [SRC.name, *sorted(set(TEXTURES.values()))]},
         "generator": "scripts/export_r1pro.py (Blender) + gltfpack" if compressed else "scripts/export_r1pro.py (Blender)",
         "triangles": triangles, "output": f"static/models/{OUT.name}",
         "output_sha256": hashlib.sha256(OUT.read_bytes()).hexdigest(), "bytes": OUT.stat().st_size,

@@ -71,8 +71,8 @@ without changing the interaction code.
   600px, and only re-renders when the video frame changes. The model comes from the
   OmniGibson soft-gripper USDA via `scripts/export_r1pro.py`, run inside Blender 4.5 (which
   welds, decimates, rebuilds the joint tree and, with Node 18+ on PATH, meshopt-compresses with
-  gltfpack). The USDA's textures are not shipped with it, so links have flat colours and the
-  viewer shades per face.
+  gltfpack). The USDA's JPEG texture atlases must sit in a `materials/` folder beside it; the
+  CAD normals are unreliable, so the viewer shades per face.
 - **Success and learning-strategy results:** filter tasks, toggle comparisons,
   and hover, tap, or focus a bar for its published value. CSV downloads contain all
   comparison columns for the selected task group, including hidden comparisons.
