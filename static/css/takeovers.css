@@ -48,8 +48,10 @@
 }
 .takeover-robot-label {
   position: absolute;
-  left: 0.6rem;
-  bottom: 0.45rem;
+  top: 0.55rem;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
   font-size: 0.7rem;
   color: #70665d;
   pointer-events: none;
