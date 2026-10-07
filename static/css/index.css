@@ -490,10 +490,32 @@ table.results-table td a:hover {
   font-weight: 600;
 }
 
-.rollout-tile figcaption .rollout-rate {
-  color: var(--i3l-orange);
+/* Success rate appears over the clip on hover or focus (always shown on touch screens). */
+.rollout-rate {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  background: var(--i3l-orange);
+  color: #fff;
+  font-size: 0.78rem;
   font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  pointer-events: none;
   white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.rollout-frame:hover .rollout-rate,
+.rollout-frame:focus-within .rollout-rate {
+  opacity: 1;
+  transform: none;
+}
+
+@media (hover: none) {
+  .rollout-rate { opacity: 1; transform: none; }
 }
 
 @media screen and (max-width: 600px) {

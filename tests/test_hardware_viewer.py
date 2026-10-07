@@ -193,7 +193,7 @@ class HardwareViewerTests(unittest.TestCase):
         overview = self.page.locator('.interactive-figure').nth(1)
         overview.locator('.hotspot-region').first.focus()
         self.page.keyboard.press('Enter')
-        expect(overview.locator('.info-title')).to_have_text('Actuated leader arms')
+        expect(self.page.locator('#viz-tip .viz-tip-title')).to_have_text('Actuated leader arms')
         context = self.browser.new_context(java_script_enabled=False)
         context.route('**/*', lambda r: r.continue_() if r.request.url.startswith(self.url) else r.abort())
         page = context.new_page()

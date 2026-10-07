@@ -34,47 +34,33 @@ This serves your local copy; publishing changes to GitHub Pages is a separate st
 - `static/videos/rollouts/` — autonomous rollout clips, one per task, each pre-rendered at 1×, 2×, 4×, and 8× (`<task>_<speed>x.mp4`) from the raw 1× footage with the same crop and trim as the I3L video slides, plus a poster frame (`<task>.jpg`); `static/js/rollouts.js` swaps clips when the speed selector changes
 - `static/paper.pdf` — drop the compiled paper here (the Paper button links to it)
 
-## Component explanations
+## Interactive figures
 
-All seven figures have numbered component hotspots. **Hover, click, tap, or use
-Tab to focus a component** to show its explanation directly below the figure.
-The explanation stays visible until you select another component, so it is easy
-to read. Each information card links to the corresponding figure in the paper.
-Figures stay inline when clicked; there is no enlarged popup viewer.
+Every figure follows one pattern: **hover, tap, or Tab to part of a figure** to highlight it
+(dimming the rest) and show its details in a tooltip beside the pointer. Specific numbers live in
+these tooltips, not in the surrounding text.
 
-The annotations cover the correction/retraining loop, leader arms and touch
-detection, each evaluation task, intervention metrics, task-stage failure modes,
-whole-body activation shares, and the three operators. Descriptions use the
-existing paper, captions, and published results; they do not invent curve values.
+- **Plots drawn from data** — intervention trends, whole-body activation shares, and the operator
+  study are rendered as SVG from the `chart` entries in `static/js/figure-config.js`. Hovering a
+  task, operator, or body part highlights it in every panel; legend entries highlight on hover and
+  pin on click. The original PNG stays in the page as the no-JavaScript and print fallback.
+- **Photo figures** — the teaser, hardware, tasks, and task-stage figures use spotlight regions from
+  the `hotspots` arrays. Each entry is
+  `["Title", [left, top, width, height], "Short note shown in the tooltip."]`, with bounds in
+  normalized image coordinates (0–1).
+- **Tables** — the success and strategy tables also render as bar explorers with value tooltips;
+  the published tables stay available under "View published table".
 
-To edit the explanations, change the `hotspots` array for an image in
-`static/js/figure-config.js`. Each entry is:
-
-```js
-["Component title", [left, top, width, height], "Explanation shown on hover or click."]
-```
-
-The bounds use normalized image coordinates (0–1). A `source: [figure, page]`
-entry controls the paper link. You can modify text or move a component region
-without changing the interaction code.
-
-## Additional interactions
-
-- **Success and learning-strategy results:** filter tasks, toggle comparisons,
-  and hover, tap, or focus a bar for its published value. CSV downloads contain all
-  comparison columns for the selected task group, including hidden comparisons.
-  The source tables remain available under “View published table”.
-- **Whole-body activation figure:** expand “Explore activation values” for the
-  corresponding comparisons and CSV download.
-
-Original images and tables remain readable with JavaScript disabled. Printing
-shows the original figures and published tables.
+Data sources: trend values were extracted from the vector paths of the paper figure
+(`intervention_trends_horizontal.pdf`) and match the published 63.4% / 69.5% / 72.0% reductions;
+operator-study values are computed from `figures/operator-study/source-data.json` in the paper repo;
+activation shares are the printed labels of Fig. 6.
 
 ## Change figures or data
 
 Replace images under `static/images/`, or update their paths in `index.html`.
-Images with `teaser-image` or `method-image` receive inline component explanations
-from `figure-config.js`. Customize their titles, hotspot bounds, and descriptions
+Images with `teaser-image` or `method-image` receive spotlight regions (or an SVG
+chart) from `figure-config.js`. Customize their titles, hotspot bounds, and notes
 there. Bounds are `[left, top, width, height]`, normalized to the original image
 dimensions, with all coordinates between 0 and 1.
 
@@ -90,15 +76,14 @@ labels in `static/images/whole_body_takeover.png` (paper Figure 6). The absent
 popcorn torso segment is zero. Published rounding is preserved, including totals
 of 99.9%.
 
-The repository contains raster exports, **not the underlying numeric series**,
-for intervention trends, task-stage curves, and the operator study. Those figures
-provide inline component explanations. Exact point tooltips or per-series
-filtering for those curves require the original plotting data; no values have
-been estimated from pixels.
+Intervention-trend and operator-study values live in the `chart` entries of
+`figure-config.js` (sources listed under *Interactive figures*). The task-stage
+curves (`correction.png`) have no source data in the repository, so that figure
+uses spotlight regions only; no values have been estimated from pixels.
 
 ## Browser checks
 
-The optional tests cover component hover/click/focus, figures staying inline,
+The optional tests cover hover/focus tooltips and highlighting, figures staying inline,
 task/series filters, published values, CSV export, mobile layout, printing, and
 the no-JavaScript fallback. They start their own temporary server and block
 external requests.
