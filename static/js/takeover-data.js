@@ -86,9 +86,9 @@ window.I3L_TAKEOVERS = [
   "title": "Prepare Make-Ahead Breakfast Bowls",
   "setting": "R1 Pro \u00b7 real world",
   "source": "I3L/bread-base-int-1-25",
-  "episode": 1,
+  "episode": 0,
   "fps": 30,
-  "frames": 1910,
+  "frames": 1951,
   "video": "./static/videos/takeovers/bread.mp4",
   "poster": "./static/videos/takeovers/bread.jpg",
   "joints": {
@@ -98,44 +98,48 @@ window.I3L_TAKEOVERS = [
   },
   "takeovers": [
    [
-    264,
-    362
+    468,
+    612
    ],
    [
-    1132,
-    1220
+    934,
+    1037
+   ],
+   [
+    1203,
+    1344
    ]
   ],
   "subtasks": [
    {
     "label": "Open drawer",
     "start": 0,
-    "end": 519
+    "end": 368
    },
    {
     "label": "Pick bowl",
-    "start": 519,
-    "end": 697
+    "start": 368,
+    "end": 722
    },
    {
     "label": "Close drawer",
-    "start": 697,
-    "end": 988
+    "start": 722,
+    "end": 1109
    },
    {
     "label": "Put bread 1",
-    "start": 988,
-    "end": 1378
+    "start": 1109,
+    "end": 1466
    },
    {
     "label": "Put bread 2",
-    "start": 1378,
-    "end": 1622
+    "start": 1466,
+    "end": 1681
    },
    {
     "label": "Place bowl",
-    "start": 1622,
-    "end": 1910
+    "start": 1681,
+    "end": 1951
    }
   ],
   "rounds": [
