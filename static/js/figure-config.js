@@ -1,7 +1,8 @@
 /* Editable figure content.
  *
  * hotspots: [title, [left, top, width, height], short note], bounds from 0 to 1. Hovering a region
- *   spotlights it and shows the note in a tooltip.
+ *   outlines it and shows the note in a tooltip.
+ * tasks: [task name, bounds]. Hovering outlines the task (no tooltip); clicking selects it everywhere.
  * chart: replaces the image with an interactive SVG drawn from the published data. The image stays
  *   in the page as the no-JavaScript and print fallback.
  */
@@ -39,30 +40,32 @@
         ["Franka and R1 Pro", [0.764, 0, 0.236, 0.79], "The same interaction supports single-arm and bimanual whole-body control."]
       ]
     },
+    // Task figures: hovering outlines a task; clicking it highlights that task across the page.
+    // Entries are [task name, bounds]; names must match the task names used in tables and charts.
     "tasks.jpeg": {
       source: [3, 4],
-      hotspots: [
-        ["Prepare Make-Ahead Breakfast Bowls", [0, 0, 0.27, 0.505], "R1 Pro · real world. Open drawer, pick bowl, close drawer, place bread, place bowl."],
-        ["Boxing Books up for Storage", [0.27, 0, 0.265, 0.505], "R1 Pro · real world. Pick and place the basket, then pick and place books."],
-        ["Mug Hanging", [0.535, 0, 0.202, 0.505], "Franka · real world. Pick up the mug and hang it on the rack."],
-        ["Pick-and-Place Strawberries", [0.737, 0, 0.263, 0.505], "A1 · BEHAVIOR simulation. Pick and place two strawberries."],
-        ["Make Microwave Popcorn", [0, 0.505, 0.27, 0.495], "R1 Pro · real world. Pick popcorn, open the microwave, place popcorn, close the microwave."],
-        ["Turning on Radio", [0.27, 0.505, 0.265, 0.495], "R1 Pro · real world. Navigate to the radio, pick it up, press the power button."],
-        ["Peg Insertion", [0.535, 0.505, 0.202, 0.495], "Franka · real world. Grasp the peg and insert it."],
-        ["Open Fridge and Pick Up Radio", [0.737, 0.505, 0.263, 0.495], "R1 Pro · BEHAVIOR simulation. Open the fridge, navigate, and place the radio."]
+      tasks: [
+        ["Prepare Make-Ahead Breakfast Bowls", [0, 0, 0.27, 0.505]],
+        ["Boxing Books up for Storage", [0.27, 0, 0.265, 0.505]],
+        ["Mug Hanging", [0.535, 0, 0.202, 0.505]],
+        ["Pick-and-Place Strawberries", [0.737, 0, 0.263, 0.505]],
+        ["Make Microwave Popcorn", [0, 0.505, 0.27, 0.495]],
+        ["Turning on Radio", [0.27, 0.505, 0.265, 0.495]],
+        ["Peg Insertion", [0.535, 0.505, 0.202, 0.495]],
+        ["Open Fridge and Pick Up Radio", [0.737, 0.505, 0.263, 0.495]]
       ]
     },
     "correction.png": {
       source: [5, 6],
-      hotspots: [
-        ["Breakfast Bowls", [0.014, 0, 0.486, 0.236], "Drawer and bread corrections fade; bowl placement remains the bottleneck."],
-        ["Boxing Books", [0.51, 0, 0.49, 0.236], "Book-pickup corrections fade; basket pickup remains."],
-        ["Mug Hanging", [0.014, 0.239, 0.486, 0.25], "Corrections fix wrong grasps and mugs left off the rack."],
-        ["Peg Insertion", [0.51, 0.239, 0.49, 0.25], "Corrections fix misaligned grasps and misaligned insertions."],
-        ["Microwave Popcorn", [0.014, 0.49, 0.486, 0.245], "Corrections span popcorn pickup, the microwave handle, and table contact."],
-        ["Turning on Radio", [0.51, 0.49, 0.49, 0.245], "Corrections fix table contact, radio grasps, and missed button presses."],
-        ["Strawberries", [0.014, 0.736, 0.486, 0.24], "Corrections fix failed grasps and stuck states."],
-        ["Open Fridge", [0.51, 0.736, 0.49, 0.24], "Corrections fix missed handles and radio misalignment."]
+      tasks: [
+        ["Prepare Make-Ahead Breakfast Bowls", [0.014, 0, 0.486, 0.236]],
+        ["Boxing Books up for Storage", [0.51, 0, 0.49, 0.236]],
+        ["Mug Hanging", [0.014, 0.239, 0.486, 0.25]],
+        ["Peg Insertion", [0.51, 0.239, 0.49, 0.25]],
+        ["Make Microwave Popcorn", [0.014, 0.49, 0.486, 0.245]],
+        ["Turning on Radio", [0.51, 0.49, 0.49, 0.245]],
+        ["Pick-and-Place Strawberries", [0.014, 0.736, 0.486, 0.24]],
+        ["Open Fridge and Pick Up Radio", [0.51, 0.736, 0.49, 0.24]]
       ]
     },
     "intervention_trends.png": {

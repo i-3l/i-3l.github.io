@@ -48,6 +48,12 @@ these tooltips, not in the surrounding text.
   the `hotspots` arrays. Each entry is
   `["Title", [left, top, width, height], "Short note shown in the tooltip."]`, with bounds in
   normalized image coordinates (0–1).
+- **Follow a task** — the tasks figure and the task-stage figure outline a task on hover (no
+  tooltip). Clicking one (or a task in the intervention-trend legend) highlights that task across
+  the page: both figures, its rollout clip, its table and explorer rows, its trend line, and its
+  body-part bar. A "Following …" bar at the bottom clears it (or press Escape). These figures use
+  `tasks: [[name, bounds], ...]` in `figure-config.js`; names must match the task names used in
+  the tables and charts.
 - **Tables** — the success and strategy tables also render as bar explorers with value tooltips;
   the published tables stay available under "View published table".
 

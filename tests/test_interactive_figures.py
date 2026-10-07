@@ -156,9 +156,9 @@ class InteractiveFiguresTests(unittest.TestCase):
         for canvas in self.page.locator(".figure-canvas").all():
             self.assertLessEqual(canvas.evaluate("e => e.scrollWidth"), 390)
 
-    def test_image_hotspots_spotlight_with_tooltip(self):
-        canvases = self.page.locator(".figure-canvas:not(.has-chart)")
-        self.assertEqual(canvases.count(), 4)
+    def test_image_hotspots_outline_with_tooltip(self):
+        canvases = self.page.locator(".figure-canvas:not(.has-chart):not([data-task-scope])")
+        self.assertEqual(canvases.count(), 2)
         for index in range(canvases.count()):
             canvas = canvases.nth(index)
             components = canvas.locator(".hotspot-region")
@@ -169,7 +169,6 @@ class InteractiveFiguresTests(unittest.TestCase):
             expect(self.tip()).to_be_visible()
             expect(self.tip().locator(".viz-tip-title")).to_have_text(title)
             expect(component).to_have_class(re.compile("is-active"))
-            expect(canvas).to_have_class(re.compile("is-spotlit"))
             last = components.last
             last.focus()
             expect(self.tip().locator(".viz-tip-title")).to_have_text(last.get_attribute("aria-label"))
@@ -177,7 +176,46 @@ class InteractiveFiguresTests(unittest.TestCase):
             self.page.mouse.click(5, 5)
             last.blur()
             expect(self.tip()).to_be_hidden()
-            expect(canvas).not_to_have_class(re.compile("is-spotlit"))
+
+    def test_task_figures_outline_without_tooltip(self):
+        canvases = self.page.locator(".figure-canvas[data-task-scope]")
+        self.assertEqual(canvases.count(), 2)
+        for index in range(canvases.count()):
+            region = canvases.nth(index).locator(".task-region").first
+            region.hover()
+            expect(region).to_have_class(re.compile("is-active"))
+            expect(self.tip()).to_be_hidden()
+            self.assertIsNone(region.get_attribute("title"))
+
+    def test_selected_task_is_highlighted_across_page(self):
+        name = "Prepare Make-Ahead Breakfast Bowls"
+        tasks_figure = self.page.locator(".figure-canvas[data-task-scope]").first
+        tasks_figure.get_by_role("button", name=name, exact=True).click()
+        follow = self.page.locator(".task-follow")
+        expect(follow).to_be_visible()
+        expect(follow).to_contain_text(name)
+        selected = self.page.locator(f'.is-task-selected[data-task="{name}"]')
+        # Both task figures, rollout tile, success explorer row, published table row, body-part row.
+        expect(selected).to_have_count(6)
+        self.assertEqual(self.page.locator(".is-task-selected").count(), 6)
+        trends = self.page.get_by_role("group", name="Intervention burden across correction rounds", exact=True)
+        expect(trends.locator(".viz-task-line.is-focus")).to_have_count(4)
+        expect(trends.get_by_role("button", name=re.compile(f"^Highlight {name}"))).to_have_attribute("aria-pressed", "true")
+        body = self.page.get_by_role("group", name="Share of body-part activations (%)", exact=True)
+        expect(body).to_have_class(re.compile("has-task-match"))
+        # Selecting a simulation task switches the strategy explorer to it.
+        trends.get_by_role("button", name=re.compile("^Highlight Pick-and-Place Strawberries")).click()
+        expect(follow).to_contain_text("Pick-and-Place Strawberries")
+        strategy = self.page.get_by_role("region", name="Compare correction-learning strategies", exact=True)
+        expect(strategy.get_by_label("Task", exact=True)).to_have_value("Pick-and-Place Strawberries")
+        expect(body).not_to_have_class(re.compile("has-task-match"))
+        follow.get_by_role("button", name="Clear", exact=True).click()
+        expect(follow).to_be_hidden()
+        expect(self.page.locator(".is-task-selected")).to_have_count(0)
+        expect(trends.locator(".viz-task-line.is-focus")).to_have_count(0)
+        tasks_figure.get_by_role("button", name="Mug Hanging", exact=True).click()
+        self.page.keyboard.press("Escape")
+        expect(follow).to_be_hidden()
 
     def test_rollout_rate_appears_on_hover(self):
         frame = self.page.locator(".rollout-frame").first

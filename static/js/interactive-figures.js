@@ -66,7 +66,7 @@
     tipOwner = null;
   }
 
-  /* Wires one element to the tooltip and to a highlight callback.
+  /* Wires one element to the tooltip and to a highlight callback (no tooltip when title is null).
    * Touch: a tap shows the tooltip until the next tap elsewhere. */
   let activeClear = null;
   function interact(element, { title, body, activate, deactivate }) {
@@ -74,7 +74,7 @@
       if (activeClear && activeClear !== clear) activeClear();
       activeClear = clear;
       activate?.();
-      showTip(element, title, body, x, y);
+      if (title != null) showTip(element, title, body, x, y);
     };
     function clear() {
       if (activeClear === clear) activeClear = null;
@@ -95,7 +95,7 @@
       if (event.pointerType === "touch" || event.detail === 0) return;
       show(event.clientX, event.clientY);
     });
-    element.setAttribute("aria-describedby", tip.id);
+    if (title != null) element.setAttribute("aria-describedby", tip.id);
   }
   document.addEventListener("pointerdown", event => {
     if (!event.target.closest?.("[aria-describedby='viz-tip']")) activeClear?.();
@@ -113,15 +113,52 @@
     });
   }
 
-  /* Legend buttons highlight a series on hover/focus; clicking pins it. */
+  /* ---------- Follow one task across the page ---------- */
+  // Clicking a task (task figures or trend legend) selects it. Every element tagged with data-task
+  // for that task gets .is-task-selected; containers marked data-task-scope get .has-task-match.
+
+  let selectedTask = null;
+  const taskListeners = [];
+  const onTaskChange = listener => taskListeners.push(listener);
+  const tagTask = (element, name) => {
+    element.dataset.task = name;
+    element.classList.toggle("is-task-selected", name === selectedTask);
+  };
+  const followBar = make("div", "task-follow");
+  followBar.setAttribute("role", "status");
+  followBar.hidden = true;
+  const followName = make("strong", "task-follow-name");
+  followBar.append(make("span", "", "Following "), followName, button("Clear", () => selectTask(null), "task-follow-clear"));
+  document.body.append(followBar);
+
+  /* Selects `name`, or clears the selection when it is null or already selected. */
+  function selectTask(name) {
+    selectedTask = name && name !== selectedTask ? name : null;
+    document.body.classList.toggle("has-task-selection", Boolean(selectedTask));
+    document.querySelectorAll("[data-task]").forEach(element => {
+      element.classList.toggle("is-task-selected", element.dataset.task === selectedTask);
+      if (element.classList.contains("task-region")) element.setAttribute("aria-pressed", String(element.dataset.task === selectedTask));
+    });
+    document.querySelectorAll("[data-task-scope]").forEach(scope => {
+      scope.classList.toggle("has-task-match", Boolean(scope.querySelector(".is-task-selected")));
+    });
+    followName.textContent = selectedTask || "";
+    followBar.hidden = !selectedTask;
+    taskListeners.forEach(listener => listener(selectedTask));
+  }
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && selectedTask) selectTask(null); });
+
+  /* Legend buttons highlight a series on hover/focus; clicking pins it (or selects its task page-wide). */
   function createLegend(root, entries) {
     const legend = make("div", "viz-legend");
     legend.setAttribute("role", "group");
     legend.setAttribute("aria-label", "Highlight a series");
-    entries.forEach(({ key, name, color, line, summary }) => {
+    root.syncLegend = () => legend.querySelectorAll("button").forEach(other => other.setAttribute("aria-pressed", String(other.dataset.key === root.pinnedKey)));
+    entries.forEach(({ key, name, color, line, summary, task }) => {
       const item = button("", () => {
+        if (task) return selectTask(task);
         root.pinnedKey = root.pinnedKey === key ? null : key;
-        legend.querySelectorAll("button").forEach(other => other.setAttribute("aria-pressed", String(other.dataset.key === root.pinnedKey)));
+        root.syncLegend();
         highlight(root, null);
       }, "viz-legend-item");
       item.dataset.key = key;
@@ -139,22 +176,28 @@
     return legend;
   }
 
-  /* ---------- Image figures: spotlight hotspots ---------- */
+  /* ---------- Image figures: outlined hotspots ---------- */
 
   function createHotspots(canvas, figure) {
+    const isTaskFigure = Boolean(figure.tasks);
     const layer = make("div", "hotspot-layer");
     layer.setAttribute("role", "group");
-    layer.setAttribute("aria-label", `Parts of ${figure.title}`);
-    figure.hotspots.forEach(([title, bounds, note]) => {
-      const region = make("button", "hotspot-region");
+    layer.setAttribute("aria-label", isTaskFigure ? `Tasks in ${figure.title}: select one to highlight it across the page` : `Parts of ${figure.title}`);
+    (figure.tasks || figure.hotspots).forEach(([title, bounds, note]) => {
+      const region = make("button", isTaskFigure ? "hotspot-region task-region" : "hotspot-region");
       region.type = "button";
       region.setAttribute("aria-label", title);
+      if (isTaskFigure) {
+        tagTask(region, title);
+        region.setAttribute("aria-pressed", "false");
+        region.addEventListener("click", () => selectTask(title));
+      }
       region.style.left = `${bounds[0] * 100}%`;
       region.style.top = `${bounds[1] * 100}%`;
       region.style.width = `${bounds[2] * 100}%`;
       region.style.height = `${bounds[3] * 100}%`;
       interact(region, {
-        title, body: note,
+        title: isTaskFigure ? null : title, body: note,
         activate: () => {
           layer.querySelectorAll(".is-active").forEach(other => other.classList.remove("is-active"));
           region.classList.add("is-active");
@@ -167,7 +210,10 @@
       });
       layer.append(region);
     });
-    const hint = make("span", "figure-hint-badge", matchMedia("(hover: none)").matches ? "Tap to explore" : "Hover to explore");
+    const touch = matchMedia("(hover: none)").matches;
+    const hint = make("span", "figure-hint-badge",
+      isTaskFigure ? `${touch ? "Tap" : "Click"} a task to follow it` : `${touch ? "Tap" : "Hover"} to explore`);
+    if (isTaskFigure) canvas.dataset.taskScope = "";
     hint.setAttribute("aria-hidden", "true");
     canvas.append(layer, hint);
   }
@@ -291,10 +337,17 @@
     root.append(createLegend(root, [
       { key: "mean", name: "Task mean", color: chart.meanColor, line: true },
       ...tasks.map((task, index) => ({
-        key: `task-${index}`, name: task.name, color: task.color,
+        key: `task-${index}`, name: task.name, color: task.color, task: task.name,
         summary: chart.panels.map(panel => `${panel.title}: ${panel.series[index].values.map(value => format(value, panel.digits)).join(", ")}`).join("; ")
       }))
     ]));
+    onTaskChange(name => {
+      const index = tasks.findIndex(task => task.name === name);
+      if (index >= 0) root.pinnedKey = `task-${index}`;
+      else if (root.pinnedKey?.startsWith("task-")) root.pinnedKey = null;
+      root.syncLegend();
+      highlight(root, null);
+    });
     return root;
   }
 
@@ -335,10 +388,12 @@
 
   function stackedChart(chart) {
     const root = make("div", "viz viz-stacked");
+    root.dataset.taskScope = "";
     root.append(createLegend(root, chart.series.map(([name, color], index) => ({ key: `part-${index}`, name, color }))));
     const rows = make("div", "viz-stack-rows");
     chart.rows.forEach(([label, values]) => {
       const row = make("div", "viz-stack-row");
+      tagTask(row, label);
       row.append(make("span", "viz-stack-label", label));
       const bar = make("div", "viz-stack-bar");
       values.forEach((value, index) => {
@@ -376,7 +431,7 @@
 
   Array.from(document.querySelectorAll("img.teaser-image, img.method-image")).forEach(image => {
     const figure = { title: image.alt || "Figure", ...config[image.src.split("/").pop()] };
-    if (!figure.hotspots && !figure.chart) return;
+    if (!figure.hotspots && !figure.tasks && !figure.chart) return;
     const wrapper = make("figure", "interactive-figure");
     const canvas = make("div", "figure-canvas");
     image.before(wrapper);
@@ -394,6 +449,11 @@
     }
   });
 
+  document.querySelectorAll(".rollout-tile").forEach(tile => {
+    const name = tile.querySelector(".rollout-task")?.textContent.trim();
+    if (name) tagTask(tile, name);
+  });
+
   /* ---------- Published tables: bar explorers ---------- */
 
   // Read the existing published tables so edits to index.html also update the charts.
@@ -401,6 +461,7 @@
     let group = "";
     const rows = [];
     table.querySelectorAll("tbody tr").forEach(row => {
+      tagTask(row, row.cells[0].textContent.trim());
       if (row.classList.contains("group-row")) {
         group = row.textContent.trim();
       } else {
@@ -478,10 +539,13 @@
       let lastGroup = null;
       filteredRows().forEach(row => {
         if (row.group && row.group !== lastGroup) {
-          plot.append(make("h4", "chart-group", row.group));
+          const heading = make("h4", "chart-group", row.group);
+          tagTask(heading, row.group);
+          plot.append(heading);
           lastGroup = row.group;
         }
         const rowElement = make("div", "chart-row");
+        tagTask(rowElement, row.label);
         rowElement.append(make("div", "chart-row-label", row.label));
         const bars = make("div", "chart-bars");
         row.values.forEach((value, index) => {
@@ -508,6 +572,12 @@
       plot.append(make("p", "chart-axis", `Bar length: 0–100${unit}`));
     }
     groupSelect.addEventListener("change", draw);
+    onTaskChange(name => {
+      if (singleGroup && groups.includes(name) && groupSelect.value !== name) {
+        groupSelect.value = name;
+        draw();
+      }
+    });
     draw();
     return chart;
   }
