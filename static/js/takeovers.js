@@ -209,7 +209,7 @@
     if (robotHost.dataset.state !== 'idle') return;
     robotHost.dataset.state = 'loading';
     try {
-      const { createRobotView } = await import('./takeover-robot.js');
+      const { createRobotView } = await import('./takeover-robot.js?v=2');
       const view = await createRobotView(robotHost, {
         modelUrl: './static/models/r1pro.glb',
         policyColor: styles.getPropertyValue('--policy').trim() || '#5b7db1',
