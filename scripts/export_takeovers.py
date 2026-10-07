@@ -60,10 +60,12 @@ TASKS = [
                      (1047, "Pick book 2"), (1504, "Place books")],
     },
     {
-        "key": "bread", "short": "Breakfast Bowls", "dataset": "bread", "episode": 10,
+        "key": "bread", "short": "Breakfast Bowls", "dataset": "bread", "episode": 23,
         "title": "Prepare Make-Ahead Breakfast Bowls", "setting": "R1 Pro · real world",
-        "subtasks": [(0, "Open drawer"), (445, "Pick bowl"), (800, "Close drawer"), (1110, "Put bread 1"),
-                     (1460, "Put bread 2"), (1770, "Place bowl")],
+        "subtasks": [(0, "Open drawer"), (615, "Pick bowl"), (975, "Close drawer"), (1285, "Put bread 1"),
+                     (1625, "Put bread 2"), (1910, "Place bowl")],
+        # The bowls cameras were under-exposed; lift the mid-tones to match the other clips.
+        "gamma": 1.25,
     },
     {
         "key": "popcorn", "short": "Popcorn", "dataset": "popcorn", "episode": 17,
@@ -109,15 +111,16 @@ def round_stats(cache, dataset):
     return stats
 
 
-def encode(cache, dataset, episode, key, fps):
+def encode(cache, dataset, episode, key, fps, gamma=1.0):
     local = cache / f"{dataset}-base-int-1"
     snapshot_download(f"I3L/{dataset}-base-int-1-25", repo_type="dataset", local_dir=local,
                       allow_patterns=[f"videos/chunk-000/observation.rgb.{c}/episode_{episode:06d}.mp4" for c in CAMERAS])
     inputs = []
     for cam in CAMERAS:
         inputs += ["-i", str(local / f"videos/chunk-000/observation.rgb.{cam}/episode_{episode:06d}.mp4")]
+    tone = f"eq=gamma={gamma}," if gamma != 1.0 else ""
     layout = ("[0:v]scale=448:448:flags=lanczos[h];[1:v][2:v]vstack=inputs=2[w];"
-              "[h][w]hstack=inputs=2,format=yuv420p[v]")
+              f"[h][w]hstack=inputs=2,{tone}format=yuv420p[v]")
     out = VIDEO_DIR / f"{key}.mp4"
     subprocess.run(["ffmpeg", "-y", "-v", "error", *inputs, "-filter_complex", layout, "-map", "[v]",
                     "-r", str(fps), "-c:v", "libx264", "-preset", "slow", "-crf", "26",
@@ -138,7 +141,7 @@ def main():
         states = int_state(local / f"data/chunk-000/episode_{episode:06d}.parquet")
         frames = len(states)
         starts = [s for s, _ in task["subtasks"]]
-        encode(cache, dataset, episode, task["key"], fps)
+        encode(cache, dataset, episode, task["key"], fps, task.get("gamma", 1.0))
         track = joint_track(local / f"data/chunk-000/episode_{episode:06d}.parquet", sim="simulation" in task["setting"])
         (VIDEO_DIR / f"{task['key']}.joints.bin").write_bytes(track.tobytes())
         exported.append({
