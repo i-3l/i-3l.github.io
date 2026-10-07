@@ -12,8 +12,9 @@ const COLUMNS = [
   'right_arm_link1', 'right_arm_link2', 'right_arm_link3', 'right_arm_link4', 'right_arm_link5', 'right_arm_link6', 'right_arm_link7',
 ];
 const FINGERS = [['left_gripper_finger_link1', 'left_gripper_finger_link2'], ['right_gripper_finger_link1', 'right_gripper_finger_link2']];
-const HOME = new THREE.Vector3(2.3, 1.7, 2.6);
-const TARGET = new THREE.Vector3(0, 0.95, 0);
+const HOME = new THREE.Vector3(2.6, 1.75, 2.75);
+// Aimed a little ahead of the robot so fully extended arms stay inside the panel.
+const TARGET = new THREE.Vector3(0.35, 0.95, 0);
 
 export async function createRobotView(host, { modelUrl, policyColor, takeoverColor }) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
