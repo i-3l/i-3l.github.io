@@ -60,10 +60,10 @@ TASKS = [
                      (1047, "Pick book 2"), (1504, "Place books")],
     },
     {
-        "key": "bread", "short": "Breakfast Bowls", "dataset": "bread", "episode": 24,
+        "key": "bread", "short": "Breakfast Bowls", "dataset": "bread", "episode": 10,
         "title": "Prepare Make-Ahead Breakfast Bowls", "setting": "R1 Pro · real world",
-        "subtasks": [(0, "Open drawer"), (525, "Pick bowl"), (1035, "Close drawer"), (1215, "Put bread 1"),
-                     (1860, "Put bread 2"), (2070, "Place bowl")],
+        "subtasks": [(0, "Open drawer"), (445, "Pick bowl"), (800, "Close drawer"), (1110, "Put bread 1"),
+                     (1460, "Put bread 2"), (1770, "Place bowl")],
     },
     {
         "key": "popcorn", "short": "Popcorn", "dataset": "popcorn", "episode": 17,
