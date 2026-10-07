@@ -10,8 +10,12 @@ plain JavaScript and CSS. There is no build step or runtime package installation
 From this directory, run:
 
 ```sh
-python3 -m http.server 8765 --bind 127.0.0.1
+python3 scripts/serve.py 8765
 ```
+
+`scripts/serve.py` is a static server with HTTP Range support, so videos can seek and keep
+their position when the rollout speed changes. Plain `python3 -m http.server` also works, but
+video seeking does not.
 
 Open http://localhost:8765. Edit a file and refresh the browser to see changes.
 This serves your local copy; publishing changes to GitHub Pages is a separate step.
@@ -27,6 +31,7 @@ This serves your local copy; publishing changes to GitHub Pages is a separate st
 - `static/models/` — self-contained GLB models exported from the repository CAD
 - `static/images/` — figures exported from the paper
 - `static/videos/walkthrough.mp4` — walkthrough video (poster frame: `static/images/video_poster.jpg`)
+- `static/videos/rollouts/` — autonomous rollout clips, one per task, each pre-rendered at 1×, 2×, 4×, and 8× (`<task>_<speed>x.mp4`) from the raw 1× footage with the same crop and trim as the I3L video slides, plus a poster frame (`<task>.jpg`); `static/js/rollouts.js` swaps clips when the speed selector changes
 - `static/paper.pdf` — drop the compiled paper here (the Paper button links to it)
 
 ## Component explanations

@@ -32,6 +32,7 @@
   <script defer src="./static/js/interactive-figures.js"></script>
   <script defer src="./static/js/analytics.js" data-endpoint="https://i3l-metrics.i3l-anonymous.workers.dev/collect"></script>
   <script defer src="./static/js/hardware-viewer.js"></script>
+  <script defer src="./static/js/rollouts.js"></script>
 </head>
 <body>
 
@@ -260,6 +261,106 @@
         (R1 Pro):</strong> four long-horizon real-world BEHAVIOR tasks: Prepare Make-Ahead Breakfast Bowls, Boxing Books
         for Storage, Make Microwave Popcorn, and Turning on Radio.
       </p>
+    </div>
+  </div>
+</div>
+
+<div class="rows">
+  <div class="container is-max-desktop">
+    <h2 id="rollouts-title" class="title is-3">Autonomous Rollouts</h2>
+    <div id="rollouts" aria-labelledby="rollouts-title">
+      <div class="rollout-controls" role="group" aria-label="Playback speed">
+        <span class="rollout-controls-label">Playback speed</span>
+        <div class="rollout-speed-group">
+          <button type="button" data-speed="1" aria-pressed="false">1×</button>
+          <button type="button" data-speed="2" aria-pressed="false">2×</button>
+          <button type="button" data-speed="4" aria-pressed="true">4×</button>
+          <button type="button" data-speed="8" aria-pressed="false">8×</button>
+        </div>
+      </div>
+
+      <div class="rollout-grid">
+        <figure class="rollout-tile">
+          <div class="rollout-frame">
+            <video muted loop playsinline controls tabindex="0" preload="none" data-clip="breakfast_bowls"
+                   poster="./static/videos/rollouts/breakfast_bowls.jpg" aria-label="R1 Pro autonomously preparing make-ahead breakfast bowls">
+              <source src="./static/videos/rollouts/breakfast_bowls_4x.mp4" type="video/mp4">
+            </video>
+            <span class="rollout-badge" aria-hidden="true">4×</span>
+          </div>
+          <figcaption><span class="rollout-task">Prepare Make-Ahead Breakfast Bowls</span> · <span class="rollout-rate">24/25 (96%)</span></figcaption>
+        </figure>
+        <figure class="rollout-tile">
+          <div class="rollout-frame">
+            <video muted loop playsinline controls tabindex="0" preload="none" data-clip="boxing_books"
+                   poster="./static/videos/rollouts/boxing_books.jpg" aria-label="R1 Pro autonomously boxing books for storage">
+              <source src="./static/videos/rollouts/boxing_books_4x.mp4" type="video/mp4">
+            </video>
+            <span class="rollout-badge" aria-hidden="true">4×</span>
+          </div>
+          <figcaption><span class="rollout-task">Boxing Books up for Storage</span> · <span class="rollout-rate">23/25 (92%)</span></figcaption>
+        </figure>
+        <figure class="rollout-tile">
+          <div class="rollout-frame">
+            <video muted loop playsinline controls tabindex="0" preload="none" data-clip="microwave_popcorn"
+                   poster="./static/videos/rollouts/microwave_popcorn.jpg" aria-label="R1 Pro autonomously making microwave popcorn">
+              <source src="./static/videos/rollouts/microwave_popcorn_4x.mp4" type="video/mp4">
+            </video>
+            <span class="rollout-badge" aria-hidden="true">4×</span>
+          </div>
+          <figcaption><span class="rollout-task">Make Microwave Popcorn</span> · <span class="rollout-rate">25/25 (100%)</span></figcaption>
+        </figure>
+        <figure class="rollout-tile">
+          <div class="rollout-frame">
+            <video muted loop playsinline controls tabindex="0" preload="none" data-clip="turning_on_radio"
+                   poster="./static/videos/rollouts/turning_on_radio.jpg" aria-label="R1 Pro autonomously turning on a radio">
+              <source src="./static/videos/rollouts/turning_on_radio_4x.mp4" type="video/mp4">
+            </video>
+            <span class="rollout-badge" aria-hidden="true">4×</span>
+          </div>
+          <figcaption><span class="rollout-task">Turning on Radio</span> · <span class="rollout-rate">24/25 (96%)</span></figcaption>
+        </figure>
+        <figure class="rollout-tile">
+          <div class="rollout-frame">
+            <video muted loop playsinline controls tabindex="0" preload="none" data-clip="mug_hanging"
+                   poster="./static/videos/rollouts/mug_hanging.jpg" aria-label="Franka autonomously hanging a mug on a rack">
+              <source src="./static/videos/rollouts/mug_hanging_4x.mp4" type="video/mp4">
+            </video>
+            <span class="rollout-badge" aria-hidden="true">4×</span>
+          </div>
+          <figcaption><span class="rollout-task">Mug Hanging</span> · <span class="rollout-rate">23/25 (92%)</span></figcaption>
+        </figure>
+        <figure class="rollout-tile">
+          <div class="rollout-frame">
+            <video muted loop playsinline controls tabindex="0" preload="none" data-clip="peg_insertion"
+                   poster="./static/videos/rollouts/peg_insertion.jpg" aria-label="Franka autonomously inserting a peg">
+              <source src="./static/videos/rollouts/peg_insertion_4x.mp4" type="video/mp4">
+            </video>
+            <span class="rollout-badge" aria-hidden="true">4×</span>
+          </div>
+          <figcaption><span class="rollout-task">Peg Insertion</span> · <span class="rollout-rate">23/25 (92%)</span></figcaption>
+        </figure>
+        <figure class="rollout-tile">
+          <div class="rollout-frame">
+            <video muted loop playsinline controls tabindex="0" preload="none" data-clip="sim_strawberries"
+                   poster="./static/videos/rollouts/sim_strawberries.jpg" aria-label="A1 autonomously picking and placing strawberries in BEHAVIOR simulation">
+              <source src="./static/videos/rollouts/sim_strawberries_4x.mp4" type="video/mp4">
+            </video>
+            <span class="rollout-badge" aria-hidden="true">4×</span>
+          </div>
+          <figcaption><span class="rollout-task">Pick-and-Place Strawberries</span> · <span class="rollout-rate">92.8%</span></figcaption>
+        </figure>
+        <figure class="rollout-tile">
+          <div class="rollout-frame">
+            <video muted loop playsinline controls tabindex="0" preload="none" data-clip="sim_fridge_radio"
+                   poster="./static/videos/rollouts/sim_fridge_radio.jpg" aria-label="R1 Pro autonomously opening a fridge and picking up a radio in BEHAVIOR simulation">
+              <source src="./static/videos/rollouts/sim_fridge_radio_4x.mp4" type="video/mp4">
+            </video>
+            <span class="rollout-badge" aria-hidden="true">4×</span>
+          </div>
+          <figcaption><span class="rollout-task">Open Fridge and Pick Up Radio</span> · <span class="rollout-rate">90.0%</span></figcaption>
+        </figure>
+      </div>
     </div>
   </div>
 </div>

@@ -57,6 +57,7 @@
     else if (el.matches('[data-arm]')) track('hardware_arm', { ...h, arm: el.dataset.arm, target: el.dataset.arm });
     else if (el.matches('[data-view]')) track('hardware_camera', { ...h, target: el.dataset.view });
     else if (el.id === 'hardware-reset') track('hardware_reset', h);
+    else if (el.matches('[data-speed]')) track('rollout_speed', { section, target: el.dataset.speed });
     else if (el.id === 'hardware-load') track('hardware_load', { ...h, target: 'manual' });
     else if (el.matches('.hotspot-region')) track('figure_select', { section, target: `${el.closest('.interactive-figure')?.querySelector('img')?.getAttribute('src')?.split('/').pop()}: ${el.getAttribute('aria-label')}` });
     else if (el.matches('.chart-mark')) track('chart_inspect', { section, target: `${chartOf(el)}: ${el.getAttribute('aria-label')}` });
