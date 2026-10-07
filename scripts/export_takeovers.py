@@ -48,9 +48,10 @@ def joint_track(parquet, sim):
     return np.round(track * JOINT_SCALE).astype("<i2")
 
 # Subtask names follow the stage labels in Fig. 5 of the paper. Each subtask ends where the next begins.
-# Books, bread and popcorn starts are the human annotations made with IIIL/scripts/data/annotate_subtask.py
-# (2026_arxiv_IIIL_paper/results/Data/Annotation/wensi-ai/<dataset>/subtask_annotations.json). Radio and the
-# sim task have no human annotations for these episodes; their starts were chosen from the camera streams.
+# Books and popcorn starts are the human annotations made with IIIL/scripts/data/annotate_subtask.py
+# (2026_arxiv_IIIL_paper/results/Data/Annotation/wensi-ai/<dataset>/subtask_annotations.json); the bread starts
+# refine that episode's annotations against the camera streams. Radio and the sim task have no human
+# annotations for these episodes; their starts were chosen from the camera streams.
 TASKS = [
     {
         "key": "books", "short": "Books", "dataset": "books", "episode": 5,
@@ -61,7 +62,8 @@ TASKS = [
     {
         "key": "bread", "short": "Breakfast Bowls", "dataset": "bread", "episode": 24,
         "title": "Prepare Make-Ahead Breakfast Bowls", "setting": "R1 Pro · real world",
-        "subtasks": [(0, "Open drawer"), (519, "Pick bowl"), (918, "Close drawer"), (1265, "Put bread 1"), (1834, "Put bread 2"), (2058, "Place bowl")],
+        "subtasks": [(0, "Open drawer"), (525, "Pick bowl"), (1035, "Close drawer"), (1215, "Put bread 1"),
+                     (1860, "Put bread 2"), (2070, "Place bowl")],
     },
     {
         "key": "popcorn", "short": "Popcorn", "dataset": "popcorn", "episode": 17,

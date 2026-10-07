@@ -114,31 +114,31 @@ window.I3L_TAKEOVERS = [
    {
     "label": "Open drawer",
     "start": 0,
-    "end": 519
+    "end": 525
    },
    {
     "label": "Pick bowl",
-    "start": 519,
-    "end": 918
+    "start": 525,
+    "end": 1035
    },
    {
     "label": "Close drawer",
-    "start": 918,
-    "end": 1265
+    "start": 1035,
+    "end": 1215
    },
    {
     "label": "Put bread 1",
-    "start": 1265,
-    "end": 1834
+    "start": 1215,
+    "end": 1860
    },
    {
     "label": "Put bread 2",
-    "start": 1834,
-    "end": 2058
+    "start": 1860,
+    "end": 2070
    },
    {
     "label": "Place bowl",
-    "start": 2058,
+    "start": 2070,
     "end": 2425
    }
   ],
