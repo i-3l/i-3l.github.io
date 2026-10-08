@@ -27,6 +27,9 @@ function assembleLeaders(source, key) {
     assembly.add(source, right);
     const mount = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.05, 0.045),
       new THREE.MeshStandardMaterial({ color: 0x898780, metalness: 0.35, roughness: 0.65 }));
+    // The fixed mounting plates end at +Z = 0.06565 m in the exported CAD.
+    // Seat the bar on their rear faces, opposite the joints, with its half-depth.
+    mount.position.z = 0.06565 + 0.045 / 2;
     assembly.add(mount);
   } else {
     // Franka's CAD is X-up; the GLB export already applies the URDF Z-up
