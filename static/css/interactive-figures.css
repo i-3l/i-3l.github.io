@@ -34,7 +34,6 @@
 .figure-canvas.is-spotlit .hotspot-region.is-task-selected {
   z-index: 1;
   border: 3px solid var(--i3l-orange, #c45b28);
-  background: rgba(196, 91, 40, 0.14);
   box-shadow: 0 0 0 1px #fff;
 }
 .rollout-tile.is-task-selected .rollout-frame { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--i3l-orange, #c45b28); }
@@ -43,12 +42,11 @@
   margin-inline: -0.5rem;
   padding-inline: 0.5rem;
   border-radius: 6px;
-  background: #fde9da;
-  box-shadow: inset 3px 0 0 var(--i3l-orange, #c45b28);
+  box-shadow: inset 0 0 0 2px var(--i3l-orange, #c45b28);
 }
 .chart-group.is-task-selected { padding-block: 0.3rem; color: #843911; }
-.results-table tr.is-task-selected td { background: #fde9da; }
-.results-table tr.is-task-selected td:first-child { box-shadow: inset 3px 0 0 var(--i3l-orange, #c45b28); font-weight: 600; }
+.results-table tr.is-task-selected { outline: 2px solid var(--i3l-orange, #c45b28); outline-offset: -2px; }
+.results-table tr.is-task-selected td:first-child { font-weight: 600; }
 .viz-stacked.has-task-match .viz-stack-row:not(.is-task-selected) { opacity: 0.3; }
 .viz-stack-row.is-task-selected .viz-stack-label { color: #843911; font-weight: 700; }
 .viz-stack-row { transition: opacity 0.15s ease; }
