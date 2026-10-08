@@ -21,7 +21,7 @@
     if (parent) parent.append(element);
     return element;
   };
-  const button = (text, action, className = "figure-control") => {
+  const button = (text, action, className) => {
     const element = make("button", className, text);
     element.type = "button";
     element.addEventListener("click", action);
@@ -477,20 +477,6 @@
     return { series: Array.from(table.querySelectorAll("thead th")).slice(1).map(cell => cell.textContent.trim()), rows };
   }
 
-  function downloadCSV(series, rows, filename) {
-    const quote = value => `"${String(value).replaceAll('"', '""')}"`;
-    const text = [["Group", "Task / setting", ...series], ...rows.map(row => [row.group || "", row.label, ...row.values])]
-      .map(row => row.map(quote).join(",")).join("\r\n");
-    const url = URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" }));
-    const link = make("a");
-    link.href = url;
-    link.download = filename;
-    document.body.append(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
   /* One block of columns: the bars of each row grouped above a short label, on a 0–100% scale.
    * Values are left off the bars; hovering a bar gives its published value. */
   function columnBlock(root, rows, { series, colors, short, apartFirst }) {
@@ -576,21 +562,9 @@
     if (!data.rows.length || data.rows.some(row => row.values.some(value => !Number.isFinite(value) || value < 0 || value > 100))) return;
     const wrapper = table.parentElement;
     const chart = columnsChart(data, { short: {}, ...options });
-    const details = make("details", "chart-details published-table");
-    details.append(make("summary", "", "View published table"));
-    wrapper.before(chart, details);
-    const download = button("Download CSV", () => downloadCSV(data.series, data.rows, `${options.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.csv`));
-    details.append(wrapper, download);
+    // The table stays in the page for print and no-JavaScript readers, hidden on screen.
+    wrapper.classList.add("is-charted");
+    wrapper.before(chart);
   });
 
-  // Closed <details> content is omitted by some browsers when printing.
-  let closedTables = [];
-  window.addEventListener("beforeprint", () => {
-    closedTables = Array.from(document.querySelectorAll(".published-table:not([open])"));
-    closedTables.forEach(details => { details.open = true; });
-  });
-  window.addEventListener("afterprint", () => {
-    closedTables.forEach(details => { details.open = false; });
-    closedTables = [];
-  });
 })();

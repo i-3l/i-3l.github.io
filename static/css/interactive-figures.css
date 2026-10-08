@@ -193,38 +193,10 @@
 .viz-stack-axis span { position: absolute; top: 0.15rem; transform: translateX(-50%); font-size: 0.7rem; color: #555; }
 .viz-axis-title { margin-top: 0.4rem; text-align: center; font-size: 0.75rem; color: #6a6a6a; }
 
-.figure-control, .chart-details > summary {
-  font: inherit;
-  font-size: 0.85rem;
-}
-.figure-control {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 0.45rem 0.8rem;
-  border: 1px solid #d6cec8;
-  border-radius: 7px;
-  background: #fff;
-  color: #843911;
-  cursor: pointer;
-  white-space: nowrap;
-  text-decoration: none;
-}
-.figure-control:hover { color: #632900; border-color: #c45b28; background: #fff7f1; }
-.figure-control:disabled { opacity: 0.4; cursor: default; }
-.figure-control:focus-visible,
-.chart-details > summary:focus-visible {
-  outline: 3px solid #176b9d;
-  outline-offset: 3px;
-}
-.chart-details { margin-top: 0.4rem; }
-.chart-details > summary { padding: 0.65rem 0; color: #843911; cursor: pointer; width: fit-content; }
-.chart-details > .figure-control { margin: 0.5rem 0 0.25rem; }
-.published-table { margin-bottom: 1rem; }
+.results-table-wrapper.is-charted { display: none; }
 
 /* Published tables as vertical grouped bars, sharing the legend, grid, and tooltip of the figures. */
-.viz-columns { --plot-h: 180px; --axis-w: 1.9rem; margin-top: 1rem; }
+.viz-columns { --plot-h: 180px; --axis-w: 1.9rem; margin: 1rem 0 1.25rem; }
 .viz-columns > .viz-legend { margin: 0 0 0.35rem; }
 .viz-columns .viz-panel-axis { margin-bottom: 0.45rem; }
 .viz-col-frame { display: flex; gap: 0.75rem; padding-left: var(--axis-w); }
@@ -310,8 +282,7 @@
   .viz-lines .viz-panels { grid-template-columns: 1fr; }
 }
 @media print {
-  .chart-details > summary, .chart-details > .figure-control { display: none !important; }
   .hotspot-layer, .figure-hint-badge, .viz, .viz-tip, .task-follow { display: none !important; }
   .figure-canvas.has-chart > .chart-fallback { display: block !important; }
-  .published-table > .results-table-wrapper { display: block !important; }
+  .results-table-wrapper.is-charted { display: block !important; }
 }

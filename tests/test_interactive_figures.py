@@ -3,7 +3,6 @@
 Run: python -m unittest discover -s tests -v
 Set I3L_CHROME to an existing Chrome executable, or install Playwright Chromium.
 """
-import csv
 import functools
 import os
 import re
@@ -74,7 +73,7 @@ class InteractiveFiguresTests(unittest.TestCase):
             expect(self.page.get_by_role("dialog")).to_have_count(0)
             self.assertNotEqual(self.page.evaluate("getComputedStyle(document.body).overflow"), "hidden")
 
-    def test_success_columns_tooltip_and_download(self):
+    def test_success_columns_tooltip(self):
         chart = self.page.get_by_role("group", name="Autonomous full-task success", exact=True)
         self.assertEqual(chart.locator(".viz-col-bar").count(), 24)
         self.assertEqual(chart.locator(".viz-col-heading").all_inner_texts(), ["Simulation", "Franka", "R1 Pro"])
@@ -87,19 +86,15 @@ class InteractiveFiguresTests(unittest.TestCase):
         expect(self.tip()).to_contain_text("23/25 (92%)")
         base = chart.get_by_role("button", name=re.compile("^Real world \\(Franka\\) · Mug Hanging · Base"))
         expect(base).to_have_class(re.compile("is-dim"))
-        details = self.page.locator(".published-table").first
-        details.locator("summary").click()
-        with self.page.expect_download() as pending:
-            details.get_by_role("button", name="Download CSV", exact=True).click()
-        with open(pending.value.path(), newline="") as file:
-            rows = list(csv.reader(file))
-        self.assertEqual(len(rows), 9)
-        self.assertEqual(rows[3], ["Real world (Franka)", "Mug Hanging", "24", "68", "92"])
+        # The published table backs the chart but is hidden on screen.
+        expect(self.page.locator("#success-results")).to_be_hidden()
+        expect(self.page.locator("summary")).to_have_count(0)
 
     def test_strategy_panels_tooltip(self):
         chart = self.page.get_by_role("group", name="Correction-learning strategy success", exact=True)
         self.assertEqual(chart.locator(".viz-col-section").count(), 2)
         self.assertEqual(chart.locator(".viz-col-bar").count(), 40)
+        self.assertEqual(chart.locator(".viz-col-heading").all_inner_texts(), ["Pick-and-Place Strawberries", "Open Fridge and Pick Up Radio"])
         bar = chart.get_by_role("button", name="Pick-and-Place Strawberries · Round 4 (100) · HG-DAgger: 92.8%", exact=True)
         bar.hover()
         expect(self.tip()).to_contain_text("HG-DAgger: 92.8%")
