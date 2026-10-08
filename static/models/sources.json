@@ -85,5 +85,18 @@
     },
     "output_sha256": "4dd93b3b7547e9db3ac5f7d4c88c048042e55d8cff5836a576dbb81b8e2a9b98",
     "bytes": 2184316
+  },
+  "r1pro_robot": {
+    "source": "r1pro_soft_gripper.usda",
+    "source_sha256": {
+      "r1pro_soft_gripper.usda": "fe339f2ad768b5a1b88a00824801f40488526049b636695589bac05f6fbb9454",
+      "./materials/output.jpg": "78c362d79cdf478a48a13a9f48cb4be4bf6a74bc9f627d222ec7f9e5adb86d84",
+      "./materials/output_torso4.jpg": "82402fe89d7f1cbc22eb66f57c0e1daf51d76a34231868da2bb9d995f33e8654"
+    },
+    "generator": "scripts/export_r1pro.py (Blender) + gltfpack",
+    "triangles": 100055,
+    "output": "static/models/r1pro.glb",
+    "output_sha256": "c112cbeb9ed3a1a14b6ac5bb2cb945c2be28cd6eb64c8982901f5b34ff43ded4",
+    "bytes": 807336
   }
 }
