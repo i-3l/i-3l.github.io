@@ -146,4 +146,33 @@
       }
     }
   };
+
+  // Published tables drawn as vertical grouped bars. Values are read from the tables in index.html;
+  // colors follow the body-part and operator figures, with ours always in teal.
+  // short: compact x-axis labels (full names stay in tooltips); a "(n)" suffix becomes a second line.
+  window.I3L_TABLE_CHARTS = {
+    "success-results": {
+      label: "Autonomous full-task success",
+      colors: ["#d3a95a", "#7f9a78", "#356d73"],
+      short: {
+        "Pick-and-Place Strawberries": "Strawberries",
+        "Open Fridge and Pick Up Radio": "Fridge & Radio",
+        "Prepare Make-Ahead Breakfast Bowls": "Breakfast Bowls",
+        "Boxing Books up for Storage": "Boxing Books",
+        "Make Microwave Popcorn": "Popcorn",
+        "Turning on Radio": "Radio",
+        "Real world (Franka)": "Franka",
+        "Real world (R1 Pro)": "R1 Pro"
+      }
+    },
+    "strategy-results": {
+      label: "Correction-learning strategy success",
+      // One panel per table group (task) instead of one bracketed row.
+      panels: true,
+      // Set the single-round baseline apart from the iterative rounds.
+      apartFirst: true,
+      colors: ["#d3a95a", "#7f9a78", "#b65c00", "#356d73"],
+      short: { "Single round": "Single", "Round 1": "R1", "Round 2": "R2", "Round 3": "R3", "Round 4": "R4" }
+    }
+  };
 })();

@@ -74,38 +74,36 @@ class InteractiveFiguresTests(unittest.TestCase):
             expect(self.page.get_by_role("dialog")).to_have_count(0)
             self.assertNotEqual(self.page.evaluate("getComputedStyle(document.body).overflow"), "hidden")
 
-    def test_success_filters_values_and_download(self):
-        chart = self.page.get_by_role("region", name="Explore autonomous success", exact=True)
-        self.assertEqual(chart.locator(".chart-mark").count(), 24)
-        chart.get_by_label("Tasks", exact=True).select_option("Real world (Franka)")
-        self.assertEqual(chart.locator(".chart-mark").count(), 6)
-        mark = chart.get_by_role("button", name="Real world (Franka) · Mug Hanging · 100 corrections (ours): 23/25 (92%)", exact=True)
-        mark.focus()
+    def test_success_columns_tooltip_and_download(self):
+        chart = self.page.get_by_role("group", name="Autonomous full-task success", exact=True)
+        self.assertEqual(chart.locator(".viz-col-bar").count(), 24)
+        self.assertEqual(chart.locator(".viz-col-heading").all_inner_texts(), ["Simulation", "Franka", "R1 Pro"])
+        # Values are only in tooltips, never printed on the chart.
+        self.assertNotIn("%", chart.locator(".viz-col-frame").inner_text().replace("Full-task success (%)", ""))
+        bar = chart.get_by_role("button", name="Real world (Franka) · Mug Hanging · 100 corrections (ours): 23/25 (92%)", exact=True)
+        self.assertEqual(bar.evaluate("e => getComputedStyle(e).backgroundColor"), "rgb(53, 109, 115)")
+        bar.focus()
         expect(self.tip()).to_be_visible()
         expect(self.tip()).to_contain_text("23/25 (92%)")
-        expect(chart.locator(".chart-readout")).to_have_count(0)
-        chart.get_by_label("Base", exact=True).uncheck()
-        self.assertEqual(chart.locator(".chart-mark").count(), 4)
+        base = chart.get_by_role("button", name=re.compile("^Real world \\(Franka\\) · Mug Hanging · Base"))
+        expect(base).to_have_class(re.compile("is-dim"))
+        details = self.page.locator(".published-table").first
+        details.locator("summary").click()
         with self.page.expect_download() as pending:
-            chart.get_by_role("button", name="Download CSV", exact=True).click()
+            details.get_by_role("button", name="Download CSV", exact=True).click()
         with open(pending.value.path(), newline="") as file:
             rows = list(csv.reader(file))
-        self.assertEqual(len(rows), 3)
-        self.assertEqual(rows[1], ["Real world (Franka)", "Mug Hanging", "24", "68", "92"])
-        chart.get_by_label("100 demos", exact=True).uncheck()
-        chart.get_by_label("100 corrections (ours)", exact=True).uncheck()
-        expect(chart.locator(".chart-empty")).to_be_visible()
-        chart.get_by_label("Base", exact=True).check()
-        self.assertEqual(chart.locator(".chart-mark").count(), 2)
+        self.assertEqual(len(rows), 9)
+        self.assertEqual(rows[3], ["Real world (Franka)", "Mug Hanging", "24", "68", "92"])
 
-    def test_strategy_chart_tooltip(self):
-        chart = self.page.get_by_role("region", name="Compare correction-learning strategies", exact=True)
-        chart.get_by_label("Task", exact=True).select_option("Pick-and-Place Strawberries")
-        self.assertEqual(chart.locator(".chart-mark").count(), 20)
-        mark = chart.get_by_role("button", name="Pick-and-Place Strawberries · Round 4 (100) · HG-DAgger: 92.8%", exact=True)
-        mark.hover()
+    def test_strategy_panels_tooltip(self):
+        chart = self.page.get_by_role("group", name="Correction-learning strategy success", exact=True)
+        self.assertEqual(chart.locator(".viz-col-section").count(), 2)
+        self.assertEqual(chart.locator(".viz-col-bar").count(), 40)
+        bar = chart.get_by_role("button", name="Pick-and-Place Strawberries · Round 4 (100) · HG-DAgger: 92.8%", exact=True)
+        bar.hover()
         expect(self.tip()).to_contain_text("HG-DAgger: 92.8%")
-        expect(mark).to_have_class(re.compile("is-selected"))
+        expect(bar).to_have_class(re.compile("is-selected"))
 
     def test_trend_chart_highlights_task_across_panels(self):
         chart = self.page.get_by_role("group", name="Intervention burden across correction rounds", exact=True)
@@ -153,7 +151,7 @@ class InteractiveFiguresTests(unittest.TestCase):
     def test_mobile_layout(self):
         self.page.set_viewport_size({"width": 390, "height": 844})
         self.assertLessEqual(self.page.evaluate("document.documentElement.scrollWidth"), 390)
-        for canvas in self.page.locator(".figure-canvas").all():
+        for canvas in self.page.locator(".figure-canvas, .viz-columns").all():
             self.assertLessEqual(canvas.evaluate("e => e.scrollWidth"), 390)
 
     def test_image_hotspots_outline_with_tooltip(self):
@@ -195,19 +193,20 @@ class InteractiveFiguresTests(unittest.TestCase):
         expect(follow).to_be_visible()
         expect(follow).to_contain_text(name)
         selected = self.page.locator(f'.is-task-selected[data-task="{name}"]')
-        # Both task figures, rollout tile, success explorer row, published table row, body-part row.
-        expect(selected).to_have_count(6)
-        self.assertEqual(self.page.locator(".is-task-selected").count(), 6)
+        # Both task figures, rollout tile, success column and its label, published table row, body-part row.
+        expect(selected).to_have_count(7)
+        self.assertEqual(self.page.locator(".is-task-selected").count(), 7)
         trends = self.page.get_by_role("group", name="Intervention burden across correction rounds", exact=True)
         expect(trends.locator(".viz-task-line.is-focus")).to_have_count(4)
         expect(trends.get_by_role("button", name=re.compile(f"^Highlight {name}"))).to_have_attribute("aria-pressed", "true")
         body = self.page.get_by_role("group", name="Share of body-part activations (%)", exact=True)
         expect(body).to_have_class(re.compile("has-task-match"))
-        # Selecting a simulation task switches the strategy explorer to it.
+        # Selecting a simulation task highlights its strategy panel.
         trends.get_by_role("button", name=re.compile("^Highlight Pick-and-Place Strawberries")).click()
         expect(follow).to_contain_text("Pick-and-Place Strawberries")
-        strategy = self.page.get_by_role("region", name="Compare correction-learning strategies", exact=True)
-        expect(strategy.get_by_label("Task", exact=True)).to_have_value("Pick-and-Place Strawberries")
+        strategy = self.page.get_by_role("group", name="Correction-learning strategy success", exact=True)
+        expect(strategy).to_have_class(re.compile("has-task-match"))
+        expect(strategy.locator(".viz-col-heading.is-task-selected")).to_have_text("Pick-and-Place Strawberries")
         expect(body).not_to_have_class(re.compile("has-task-match"))
         follow.get_by_role("button", name="Clear", exact=True).click()
         expect(follow).to_be_hidden()

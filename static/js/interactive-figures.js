@@ -8,7 +8,6 @@
   "use strict";
 
   const config = window.I3L_FIGURES || {};
-  const colors = ["#496d88", "#819273", "#c45b28", "#76568f"];
   const SVG_NS = "http://www.w3.org/2000/svg";
   const make = (tag, className, text) => {
     const element = document.createElement(tag);
@@ -454,7 +453,7 @@
     if (name) tagTask(tile, name);
   });
 
-  /* ---------- Published tables: bar explorers ---------- */
+  /* ---------- Published tables: vertical grouped bars ---------- */
 
   // Read the existing published tables so edits to index.html also update the charts.
   function readTable(table) {
@@ -492,115 +491,96 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  function createChart({ title, series, rows, note, unit = "%", palette = colors, singleGroup = false }) {
-    const chart = make("section", "results-explorer");
-    chart.setAttribute("aria-label", title);
-    chart.append(make("h3", "explorer-title", title));
-    const controls = make("div", "chart-controls");
-    const groups = Array.from(new Set(rows.map(row => row.group).filter(Boolean)));
-    const groupSelect = make("select", "figure-select");
-    groupSelect.setAttribute("aria-label", singleGroup ? "Task" : "Tasks");
-    const groupLabel = make("label", "figure-field", singleGroup ? "Task" : "Tasks");
-    groupLabel.append(groupSelect);
-    if (!singleGroup) groupSelect.add(new Option("All tasks", ""));
-    groups.forEach(group => groupSelect.add(new Option(group, group)));
-    if (groups.length) controls.append(groupLabel);
-    const exportButton = button("Download CSV", () => downloadCSV(series, filteredRows(), `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.csv`));
-    controls.append(exportButton);
-    chart.append(controls);
-    const legend = make("fieldset", "chart-legend");
-    legend.append(make("legend", "figure-hint", "Show comparisons"));
-    const visible = new Set(series.map((_, index) => index));
-    series.forEach((name, index) => {
-      const label = make("label", "legend-item");
-      label.style.setProperty("--series-color", palette[index % palette.length]);
-      const checkbox = make("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = true;
-      checkbox.addEventListener("change", () => {
-        if (checkbox.checked) visible.add(index);
-        else visible.delete(index);
-        draw();
-      });
-      label.append(checkbox, make("span", "", name));
-      legend.append(label);
+  /* One block of columns: the bars of each row grouped above a short label, on a 0–100% scale.
+   * Values are left off the bars; hovering a bar gives its published value. */
+  function columnBlock(root, rows, { series, colors, short, apartFirst }) {
+    const block = make("div", "viz-col-block");
+    const groups = make("div", "viz-col-groups");
+    const labels = make("div", "viz-col-labels");
+    const grid = make("div", "viz-col-grid");
+    grid.setAttribute("aria-hidden", "true");
+    [0, 25, 50, 75, 100].forEach(tick => {
+      const line = make("span", "viz-col-tick", String(tick));
+      line.style.bottom = `${tick}%`;
+      grid.append(line);
     });
-    chart.append(legend);
-    const plot = make("div", "comparison-plot");
-    chart.append(plot, make("p", "figure-hint chart-source", note));
-    const filteredRows = () => rows.filter(row => !groups.length || !groupSelect.value || row.group === groupSelect.value);
-    function draw() {
-      plot.replaceChildren();
-      hideTip();
-      if (!visible.size) {
-        plot.append(make("p", "chart-empty", "Select a comparison above to show its values."));
-        return;
-      }
-      let lastGroup = null;
-      filteredRows().forEach(row => {
-        if (row.group && row.group !== lastGroup) {
-          const heading = make("h4", "chart-group", row.group);
-          tagTask(heading, row.group);
-          plot.append(heading);
-          lastGroup = row.group;
-        }
-        const rowElement = make("div", "chart-row");
-        tagTask(rowElement, row.label);
-        rowElement.append(make("div", "chart-row-label", row.label));
-        const bars = make("div", "chart-bars");
-        row.values.forEach((value, index) => {
-          if (!visible.has(index)) return;
-          const original = row.originals?.[index];
-          const shown = original?.includes("%") ? original : `${value}${unit}`;
-          const mark = make("button", "chart-mark");
-          mark.type = "button";
-          mark.setAttribute("aria-label", `${row.group ? `${row.group} · ` : ""}${row.label} · ${series[index]}: ${shown}`);
-          mark.style.setProperty("--series-color", palette[index % palette.length]);
-          const fill = make("span", "chart-fill");
-          fill.style.width = `${value}%`;
-          mark.append(fill, make("span", "chart-series-name", series[index]), make("span", "chart-value", `${value}${unit}`));
-          interact(mark, {
-            title: row.label, body: `${series[index]}: ${shown}`,
-            activate: () => mark.classList.add("is-selected"),
-            deactivate: () => mark.classList.remove("is-selected")
-          });
-          bars.append(mark);
+    groups.append(grid);
+    rows.forEach((row, rowIndex) => {
+      const group = make("div", "viz-col-group");
+      const label = make("div", "viz-col-label");
+      if (apartFirst && rowIndex === 0) [group, label].forEach(element => element.classList.add("is-apart"));
+      tagTask(group, row.label);
+      tagTask(label, row.label);
+      row.values.forEach((value, index) => {
+        const original = row.originals[index];
+        const shown = original.includes("%") ? original : `${original}%`;
+        const bar = make("button", "viz-col-bar");
+        bar.type = "button";
+        bar.style.height = `${value}%`;
+        bar.style.setProperty("--series-color", colors[index % colors.length]);
+        bar.dataset.key = `series-${index}`;
+        bar.setAttribute("aria-label", `${row.group ? `${row.group} · ` : ""}${row.label} · ${series[index]}: ${shown}`);
+        interact(bar, {
+          title: row.label, body: `${series[index]}: ${shown}`,
+          activate: () => { bar.classList.add("is-selected"); highlight(root, bar.dataset.key); },
+          deactivate: () => { bar.classList.remove("is-selected"); highlight(root, null); }
         });
-        rowElement.append(bars);
-        plot.append(rowElement);
+        group.append(bar);
       });
-      plot.append(make("p", "chart-axis", `Bar length: 0–100${unit}`));
-    }
-    groupSelect.addEventListener("change", draw);
-    onTaskChange(name => {
-      if (singleGroup && groups.includes(name) && groupSelect.value !== name) {
-        groupSelect.value = name;
-        draw();
-      }
+      // "Round 1 (25)" → "R1" over "25"; tasks without a count keep one line.
+      const [, name, count] = row.label.match(/^(.*?)(?: \((\d+)\))?$/);
+      label.append(make("span", "viz-col-name", short[name] || name));
+      if (count) label.append(make("span", "viz-col-count", count));
+      label.title = row.label;
+      groups.append(group);
+      labels.append(label);
     });
-    draw();
-    return chart;
+    block.append(groups, labels);
+    return block;
   }
 
-  const tableCharts = [
-    ["success-results", "Explore autonomous success", false],
-    ["strategy-results", "Compare correction-learning strategies", true]
-  ];
-  tableCharts.forEach(([id, title, singleGroup]) => {
+  function columnsChart({ series, rows }, options) {
+    const root = make("div", "viz viz-columns");
+    root.dataset.taskScope = "";
+    root.setAttribute("role", "group");
+    root.setAttribute("aria-label", options.label);
+    root.append(createLegend(root, series.map((name, index) => ({ key: `series-${index}`, name, color: options.colors[index % options.colors.length] }))));
+
+    const axis = "Full-task success (%)";
+    const grouped = [];
+    rows.forEach(row => {
+      if (grouped.at(-1)?.name !== row.group) grouped.push({ name: row.group, rows: [] });
+      grouped.at(-1).rows.push(row);
+    });
+    const frame = make("div", options.panels ? "viz-col-frame is-panels" : "viz-col-frame");
+    grouped.forEach(({ name, rows: groupRows }) => {
+      const section = make("div", "viz-col-section");
+      section.style.setProperty("--columns", groupRows.length);
+      const plot = columnBlock(root, groupRows, { ...options, series });
+      const heading = make("div", "viz-col-heading", options.short[name] || name);
+      heading.title = name;
+      tagTask(heading, name);
+      if (options.panels) section.append(heading, make("p", "viz-panel-axis", axis), plot);
+      else section.append(plot, heading);
+      frame.append(section);
+    });
+    if (!options.panels) root.append(make("p", "viz-panel-axis", axis));
+    root.append(frame);
+    return root;
+  }
+
+  Object.entries(window.I3L_TABLE_CHARTS || {}).forEach(([id, options]) => {
     const table = document.getElementById(id);
     if (!table) return;
     const data = readTable(table);
     if (!data.rows.length || data.rows.some(row => row.values.some(value => !Number.isFinite(value) || value < 0 || value > 100))) return;
     const wrapper = table.parentElement;
-    const chart = createChart({
-      ...data, title, singleGroup,
-      palette: singleGroup ? ["#496d88", "#819273", "#76568f", "#c45b28"] : colors,
-      note: "Full-task success (%), from the published table below. Downloads include all comparison columns for the selected tasks."
-    });
+    const chart = columnsChart(data, { short: {}, ...options });
     const details = make("details", "chart-details published-table");
     details.append(make("summary", "", "View published table"));
     wrapper.before(chart, details);
-    details.append(wrapper);
+    const download = button("Download CSV", () => downloadCSV(data.series, data.rows, `${options.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.csv`));
+    details.append(wrapper, download);
   });
 
   // Closed <details> content is omitted by some browsers when printing.
