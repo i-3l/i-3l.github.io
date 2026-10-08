@@ -62,7 +62,10 @@
     <img class="teaser-image" src="./static/images/teaser.jpg"
          alt="I3L overview: operator takes over with JoyLo+, corrections are aggregated for retraining, and representative tasks and embodiments.">
     <p class="teaser-caption">
-      <strong>I3L couples interactive correction with iterative policy refinement.</strong>
+      <strong>I3L couples interactive whole-body correction with iterative policy refinement.</strong> Left: as a deployed
+      policy nears failure, the operator grasps JoyLo+ and corrects the arms, torso, and base together. Middle: corrections
+      are aggregated with prior demonstrations to retrain and redeploy the policy. Right: the loop is evaluated on three
+      robots across eight simulated and real-world tasks.
     </p>
 
     <h2 class="title is-3 has-text-centered">Abstract</h2>
@@ -229,14 +232,14 @@
     <h2 class="title is-3">Tasks and Embodiments</h2>
     <img class="method-image" src="./static/images/tasks.jpeg" alt="Eight evaluation tasks across A1, Franka, and R1 Pro in simulation and the real world.">
     <p class="figure-caption">
-      <strong>Evaluation tasks.</strong> Initial configurations and successful outcomes; yellow mats mark where the R1 Pro
+      <strong>Evaluation tasks.</strong> Initial configurations and successful outcomes. Yellow mats mark where the R1 Pro
       base and task objects are randomized.
     </p>
     <div class="content has-text-justified" style="margin-top: 1.25rem;">
       <p>
-        Eight tasks on three robots: two controlled BEHAVIOR simulation tasks for comparing collection and learning
-        strategies, two contact-rich precision tasks on Franka, and four long-horizon whole-body mobile manipulation tasks
-        on a real R1 Pro.
+        We evaluate I3L on eight tasks across three robots: two controlled BEHAVIOR simulation tasks for comparing
+        collection and learning strategies, two contact-rich precision tasks on a Franka, and four long-horizon whole-body
+        mobile manipulation tasks on a real R1 Pro.
       </p>
     </div>
     <div id="rollouts" aria-label="Autonomous rollouts">
@@ -484,7 +487,8 @@
             whole robot.
           </p>
           <p>
-            Operators use this: on every task, a large share of corrections move the base rather than only the arms.
+            Operators use this: on every task, corrections engage the torso and base as well as the arms, rather than
+            the arms alone.
           </p>
         </div>
       </div>
