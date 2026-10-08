@@ -104,7 +104,7 @@ class HardwareViewerTests(unittest.TestCase):
             before_values = inputs.evaluate_all('(nodes) => nodes.map(n => n.value)')
             before_image = canvas.screenshot()
             self.page.get_by_role('button', name=f'{arm} arm', exact=True).click()
-            expect(self.page.get_by_role('slider')).to_have_count(7)
+            expect(self.page.locator('#hardware-joint-controls').get_by_role('slider')).to_have_count(7)
             self.page.get_by_label(f'{arm} Joint 4', exact=True).evaluate(
                 '(n) => { n.value = -85; n.dispatchEvent(new Event("input")); }')
             self.assertNotEqual(before_image, canvas.screenshot())

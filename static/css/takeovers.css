@@ -1,0 +1,324 @@
+/* Takeover timeline section: task tabs, video with live status badge, and a two-row timeline. */
+#takeovers {
+  --policy: #5b7db1;
+  --policy-soft: #dde5f1;
+  --takeover: var(--i3l-orange, #C45B28);
+  --subtask: #eceae6;
+  --subtask-current: #d8d3cb;
+  --rule: #d9d9d9;
+  --ink: #363636;
+  --muted: var(--text-muted, #4a4a4a);
+}
+
+.takeover-player {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Video beside the 3D robot; the controls and timeline below span both. */
+.takeover-stage-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 12px;
+  align-items: stretch;
+}
+#takeovers.no-robot .takeover-stage-row { grid-template-columns: minmax(0, 1fr); max-width: 760px; margin: 0 auto; }
+#takeovers.no-robot .takeover-robot { display: none; }
+
+.takeover-robot {
+  position: relative;
+  min-height: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f3f1ed;
+  background-image: radial-gradient(#d7d0c7 0.65px, transparent 0.65px);
+  background-size: 18px 18px;
+  touch-action: none;
+}
+.takeover-robot canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; cursor: grab; }
+.takeover-robot canvas:active { cursor: grabbing; }
+.takeover-robot[data-state="loading"]::after {
+  content: "Loading robot…";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.takeover-robot-label {
+  position: absolute;
+  top: 0.55rem;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.7rem;
+  color: #70665d;
+  pointer-events: none;
+}
+.takeover-robot-reset {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.takeover-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0 0 1rem;
+}
+
+.takeover-tab {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.takeover-tab:hover { border-color: #b5b5b5; }
+
+.takeover-tab[aria-selected="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.takeover-tab:focus-visible,
+.takeover-controls button:focus-visible,
+.takeover-timeline:focus-visible {
+  outline: 2px solid var(--takeover);
+  outline-offset: 2px;
+}
+
+.takeover-stage {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #111;
+}
+
+.takeover-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  cursor: pointer;
+}
+
+.takeover-camera {
+  position: absolute;
+  bottom: 0.4rem;
+  font-size: 0.7rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 0.05rem 0.4rem;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.takeover-badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--policy);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: background-color 120ms ease;
+  pointer-events: none;
+}
+
+.takeover-badge::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.takeover-badge.is-takeover { background: var(--takeover); }
+
+.takeover-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  margin: 0.75rem 0 0.6rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.takeover-controls button {
+  font: inherit;
+  border: 1px solid var(--rule);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+}
+
+/* Icons drawn in CSS: a triangle for play, two bars for pause. */
+.takeover-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 1.75rem;
+}
+.takeover-play::before {
+  content: "";
+  box-sizing: border-box;
+  width: 0;
+  height: 0;
+  margin-left: 0.15rem;
+  border-style: solid;
+  border-width: 0.4rem 0 0.4rem 0.65rem;
+  border-color: transparent transparent transparent currentColor;
+}
+.takeover-play[aria-pressed="true"]::before {
+  width: 0.6rem;
+  height: 0.75rem;
+  margin-left: 0;
+  border-width: 0 0.2rem;
+  border-color: currentColor;
+}
+
+.takeover-speed { display: inline-flex; }
+.takeover-speed button { border-radius: 0; margin-left: -1px; }
+.takeover-speed button:first-child { border-radius: 4px 0 0 4px; margin-left: 0; }
+.takeover-speed button:last-child { border-radius: 0 4px 4px 0; }
+.takeover-speed button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+.takeover-clock { font-variant-numeric: tabular-nums; }
+.takeover-controls .takeover-legend { margin-left: auto; }
+
+.takeover-timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4.6rem 1fr;
+  row-gap: 0.3rem;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+.takeover-row-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  align-self: center;
+}
+
+.takeover-row {
+  position: relative;
+  height: 1.7rem;
+}
+
+.takeover-row-control {
+  height: 1rem;
+  border-radius: 3px;
+  background: var(--policy);
+  overflow: hidden;
+}
+
+.takeover-subtask {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--subtask);
+  border-right: 2px solid #fff;
+  font-size: 0.72rem;
+  color: var(--ink);
+  overflow: hidden;
+  transition: background-color 120ms ease;
+}
+
+.takeover-subtask:first-child { border-radius: 3px 0 0 3px; }
+.takeover-subtask:last-child { border-radius: 0 3px 3px 0; border-right: 0; }
+.takeover-subtask span { padding: 0 0.1rem; line-height: 1.05; text-align: center; }
+.takeover-subtask.is-cramped span { visibility: hidden; }
+.takeover-subtask.is-current { background: var(--subtask-current); font-weight: 600; }
+
+.takeover-block {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--takeover);
+}
+
+/* Spans both rows; positioned within the second grid column. */
+.takeover-track-overlay {
+  position: absolute;
+  top: -0.2rem;
+  bottom: -0.2rem;
+  left: 4.6rem;
+  right: 0;
+  pointer-events: none;
+}
+
+.takeover-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: #111;
+}
+
+.takeover-playhead::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  border: 5px solid transparent;
+  border-top-color: #111;
+}
+
+.takeover-legend { display: inline-flex; gap: 0.9rem; }
+.takeover-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 2px;
+  margin-right: 0.3rem;
+  vertical-align: -0.1rem;
+  background: var(--policy);
+}
+.takeover-legend .is-takeover::before { background: var(--takeover); }
+
+@media screen and (max-width: 768px) {
+  .takeover-stage-row { grid-template-columns: minmax(0, 1fr); }
+  .takeover-robot { aspect-ratio: 3 / 2; }
+}
+
+@media screen and (max-width: 600px) {
+  .takeover-timeline { grid-template-columns: 0 1fr; }
+  .takeover-row-label { visibility: hidden; }
+  .takeover-track-overlay { left: 0; }
+  .takeover-controls .takeover-legend { margin-left: 0; }
+  .takeover-camera { display: none; }
+  .takeover-robot { display: none; }
+}
