@@ -251,39 +251,6 @@ h1.title.publication-title {
   }
 }
 
-.stat-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin: 1.25rem 0 1.5rem;
-}
-
-.stat-tile {
-  flex: 1 1 180px;
-  max-width: 220px;
-  text-align: center;
-  background: #fff;
-  border: 1px solid #e6e6e6;
-  border-radius: 12px;
-  padding: 1rem 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.stat-value {
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: var(--i3l-orange);
-  line-height: 1.1;
-}
-
-.stat-label {
-  font-size: 0.85rem;
-  color: #555;
-  margin-top: 0.35rem;
-  line-height: 1.35;
-}
-
 .results-table-wrapper {
   overflow-x: auto;
   margin: 0 auto 1rem;
