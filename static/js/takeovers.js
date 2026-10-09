@@ -162,8 +162,10 @@
   }
 
   // Seeking ---------------------------------------------------------------------------------
+  // Measure against the track, not the whole timeline: the timeline also holds the row-label
+  // column, while the playhead and segments are laid out inside the track column only.
   function seekTo(clientX) {
-    const rect = timeline.getBoundingClientRect();
+    const rect = controlRow.getBoundingClientRect();
     const x = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
     video.currentTime = Math.min(x * task.frames, task.frames - 1) / task.fps;
     update();
