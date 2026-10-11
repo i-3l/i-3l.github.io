@@ -1,0 +1,75 @@
+/* Reflow the three panels of the original 2748 × 1021 overview on phones.
+ * The source image and desktop hotspots stay intact; no new raster is needed. */
+.teaser-mobile-fallback,
+.teaser-stacked-direction { display: none; }
+
+@media screen and (max-width: 600px) {
+  .teaser-overview {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+  }
+  .teaser-overview .teaser-caption {
+    order: -1;
+    margin: 0 0 0.85rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    text-align: left;
+  }
+  .teaser-overview .teaser-image,
+  .teaser-wide-direction { display: none; }
+  .teaser-stacked-direction { display: inline; }
+
+  .teaser-overview .hotspot-layer,
+  .teaser-mobile-fallback {
+    position: static;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .teaser-overview:has(.hotspot-layer) .teaser-mobile-fallback { display: none; }
+
+  .teaser-overview .figure-canvas .hotspot-layer .hotspot-region,
+  .teaser-mobile-panel {
+    position: relative;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: var(--panel-width) / 1021;
+    border: 0;
+    border-radius: 6px;
+  }
+  .teaser-overview .hotspot-region::before,
+  .teaser-mobile-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("../images/teaser.jpg");
+    background-repeat: no-repeat;
+    background-size: calc(2748 / var(--panel-width) * 100%) 100%;
+    background-position: var(--panel-position) 0;
+  }
+  /* Crop at the existing white gutters: [839, 857) and [1709, 1726). */
+  .teaser-overview .hotspot-region:nth-child(1),
+  .teaser-mobile-panel:nth-child(1) {
+    --panel-width: 839;
+    --panel-position: 0%;
+  }
+  .teaser-overview .hotspot-region:nth-child(2),
+  .teaser-mobile-panel:nth-child(2) {
+    --panel-width: 852;
+    --panel-position: calc(857 / 1896 * 100%);
+  }
+  .teaser-overview .hotspot-region:nth-child(3),
+  .teaser-mobile-panel:nth-child(3) {
+    --panel-width: 1022;
+    --panel-position: 100%;
+  }
+  .teaser-overview .hotspot-region:is(:focus-visible, .is-active, [aria-pressed="true"]) {
+    outline: 2px solid var(--i3l-orange);
+    outline-offset: 2px;
+  }
+  .teaser-overview .hotspot-dot { top: 3rem; left: 0.5rem; z-index: 1; }
+  .teaser-overview .figure-hint-badge { top: 3rem; }
+  .teaser-overview .figure-info { min-height: 0; }
+}

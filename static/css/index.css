@@ -133,20 +133,37 @@ h1.title.publication-title {
 }
 
 @media screen and (max-width: 600px) {
-  .button-container {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.6em;
+  .hero .hero-body {
+    padding: 1.25rem 1rem 0.5rem;
   }
-  .button {
-    margin-left: 0;
-    margin-right: 0;
+  .hero .columns {
+    margin: 0;
+  }
+  .hero .column {
+    padding: 0;
+  }
+  .hero .button-container {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+    padding-top: 0;
+  }
+  .hero .button {
+    margin: 0;
     width: 100%;
-    max-width: 280px;
+    min-width: 0;
+    min-height: 38px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.8rem;
     white-space: normal;
   }
   h1.title.publication-title {
-    font-size: 2rem;
+    font-size: clamp(1.35rem, 5.4vw, 1.65rem);
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  .hero + .rows {
+    margin-top: 0.5rem;
   }
 }
 

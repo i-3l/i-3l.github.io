@@ -24,8 +24,9 @@
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="stylesheet" href="./static/css/index.css?v=20261011-bom-width">
+  <link rel="stylesheet" href="./static/css/index.css?v=20261011-mobile-overview">
   <link rel="stylesheet" href="./static/css/interactive-figures.css">
+  <link rel="stylesheet" href="./static/css/teaser-mobile.css">
   <link rel="stylesheet" href="./static/css/hardware-viewer.css?v=20261011-simple-viewer">
   <link rel="stylesheet" href="./static/css/takeovers.css?v=3">
   <script defer src="./static/js/fontawesome.all.min.js"></script>
@@ -61,11 +62,18 @@
 
 <div class="rows">
   <div class="container is-max-desktop">
-    <img class="teaser-image" src="./static/images/teaser.jpg"
-         alt="I3L overview: operator takes over with JoyLo+, corrections are aggregated for retraining, and representative tasks and embodiments.">
-    <p class="teaser-caption">
-      <strong>I3L couples interactive correction with iterative policy refinement.</strong>
-    </p>
+    <div class="teaser-overview">
+      <img class="teaser-image" src="./static/images/teaser.jpg"
+           alt="I3L overview: operator takes over with JoyLo+, corrections are aggregated for retraining, and representative tasks and embodiments.">
+      <div class="teaser-mobile-fallback">
+        <div class="teaser-mobile-panel" role="img" aria-label="Whole-body corrections with JoyLo+: an operator guides the leader arms to correct the mobile robot."></div>
+        <div class="teaser-mobile-panel" role="img" aria-label="Iterative corrective learning: collect human corrections, retrain with prior demonstrations, and redeploy the policy."></div>
+        <div class="teaser-mobile-panel" role="img" aria-label="Diverse manipulation tasks across three robot embodiments."></div>
+      </div>
+      <p class="teaser-caption">
+        <strong>I3L couples interactive correction with iterative policy refinement.</strong>
+      </p>
+    </div>
 
     <h2 class="title is-3 has-text-centered">Abstract</h2>
     <div class="content has-text-justified">
