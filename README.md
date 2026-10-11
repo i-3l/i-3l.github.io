@@ -133,7 +133,7 @@ I3L_CHROME=/usr/bin/google-chrome .venv/bin/python -m unittest discover -s tests
 
 ## Interactive hardware
 
-The **Explore hardware** link goes to `#hardware`. The viewer loads the R1 Pro
+The **Hardware** link goes to `#hardware`. The viewer loads the R1 Pro
 leaders as the section approaches the viewport; Franka loads only when selected.
 R1 Pro shows a **bimanual pair with 14 independent joints**. Use Left arm / Right
 arm to choose which seven joints to adjust; both arms remain visible and retain

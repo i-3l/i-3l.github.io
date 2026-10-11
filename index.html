@@ -51,7 +51,7 @@
             <a href="static/paper.pdf" target="_blank" class="button"><i class="fa fa-file-alt"></i>&emsp14;Paper</a>
             <a href="https://github.com/i-3l/I3L" target="_blank" rel="noopener" class="button"><i class="fa fa-code"></i>&emsp14;Code</a>
             <a href="https://huggingface.co/I3L" target="_blank" rel="noopener" class="button"><i class="fa fa-database"></i>&emsp14;Models &amp; Datasets</a>
-            <a href="#hardware" class="button">Explore hardware&nbsp;↓</a>
+            <a href="#hardware" class="button"><i class="fa fa-tools" aria-hidden="true"></i>&emsp14;Hardware</a>
           </div>
         </div>
       </div>
@@ -145,7 +145,6 @@
             </div>
             <div id="hardware-joint-controls"></div>
             <button type="button" id="hardware-reset">Reset pose</button>
-            <p class="hardware-joint-note">Explore each joint’s range. Poses are illustrative; collisions are not simulated.</p>
           </fieldset>
           <p class="hardware-static-note">Motorized links track the policy. Grasping the touch-sensitive grip lets the operator take over.</p>
         </div>
@@ -189,15 +188,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td>XM430-W350-T servo</td><td>$220</td><td>3</td><td>4</td></tr>
-          <tr><td>XC330-M288-T servo</td><td>$50</td><td>4</td><td>3</td></tr>
-          <tr><td>U2D2 USB adapter</td><td>$30</td><td>2</td><td>2</td></tr>
-          <tr><td>Power supply (12&thinsp;V / 5&thinsp;V)</td><td>$25</td><td>2</td><td>2</td></tr>
-          <tr><td>3D-printed links (set)</td><td>$15</td><td>1</td><td>1</td></tr>
-          <tr><td>Joy-Con pair (L+R)</td><td>$80</td><td>1</td><td>1</td></tr>
-          <tr><td><a href="https://www.adafruit.com/product/1982" target="_blank" rel="noopener">Adafruit MPR121 touch sensor</a></td><td>$7.95</td><td>1</td><td>1</td></tr>
-          <tr><td><a href="https://lilygo.cc/products/t-display-s3" target="_blank" rel="noopener">LILYGO T-Display S3</a></td><td>$9.54</td><td>1</td><td>1</td></tr>
-          <tr><td>Conductive copper tape</td><td>$5</td><td>1</td><td>1</td></tr>
+          <tr><td><a href="https://robotis.us/products/dynamixel-xm430-w350-t" target="_blank" rel="noopener noreferrer">XM430-W350-T servo</a></td><td>$220</td><td>3</td><td>4</td></tr>
+          <tr><td><a href="https://robotis.us/products/dynamixel-xc330-m288-t" target="_blank" rel="noopener noreferrer">XC330-M288-T servo</a></td><td>$50</td><td>4</td><td>3</td></tr>
+          <tr><td><a href="https://robotis.us/products/u2d2" target="_blank" rel="noopener noreferrer">U2D2 USB adapter</a></td><td>$30</td><td>2</td><td>2</td></tr>
+          <tr><td><a href="https://www.adafruit.com/category/137" target="_blank" rel="noopener noreferrer">Power supply (12&thinsp;V / 5&thinsp;V)</a></td><td>$25</td><td>2</td><td>2</td></tr>
+          <tr><td>3D-printed links (set)<br><small>Assembly models: <a href="./static/models/joylo-franka.glb" download>Franka</a> · <a href="./static/models/joylo-r1pro.glb" download>R1 Pro</a></small></td><td>$15</td><td>1</td><td>1</td></tr>
+          <tr><td><a href="https://www.nintendo.com/us/store/products/joy-con-set-l-r-neon-red-neon-blue/" target="_blank" rel="noopener noreferrer">Joy-Con pair (L+R)</a></td><td>$80</td><td>1</td><td>1</td></tr>
+          <tr><td><a href="https://www.adafruit.com/product/1982" target="_blank" rel="noopener noreferrer">Adafruit MPR121 touch sensor</a></td><td>$7.95</td><td>1</td><td>1</td></tr>
+          <tr><td><a href="https://lilygo.cc/products/t-display-s3" target="_blank" rel="noopener noreferrer">LILYGO T-Display S3</a></td><td>$9.54</td><td>1</td><td>1</td></tr>
+          <tr><td><a href="https://www.adafruit.com/product/1128" target="_blank" rel="noopener noreferrer">Conductive copper tape</a></td><td>$5</td><td>1</td><td>1</td></tr>
           <tr class="total-row"><td colspan="2">Estimated total (USD)</td><td>$1,087.49</td><td>$1,257.49</td></tr>
         </tbody>
       </table>
@@ -205,7 +204,7 @@
     <p id="bom-scope" class="figure-caption">
       <strong>Single-arm JoyLo+ cost estimates from Appendix B (USD).</strong> Each column covers one seven-joint
       leader and the listed accessories. Robot, tax, shipping, cabling, fasteners, bearings, and mounting hardware
-      are excluded.
+      are excluded. Vendor prices may differ. Power-supply and copper-tape links are sourcing references.
     </p>
   </div>
 </div>

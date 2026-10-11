@@ -58,7 +58,7 @@ class HardwareViewerTests(unittest.TestCase):
         self.page.set_viewport_size({'width': 1440, 'height': 650})
         self.page.goto(self.url, wait_until='networkidle')
         self.assertFalse(any('.glb' in url or 'hardware-scene' in url for url in requested))
-        self.page.get_by_role('link', name='Explore hardware').click()
+        self.page.get_by_role('link', name='Hardware', exact=True).click()
         expect(self.page.locator('#hardware-viewer')).to_have_attribute('data-state', 'ready', timeout=30000)
         canvas = self.page.locator('#hardware-canvas canvas')
         self.assertFalse(any('joylo-franka.glb' in url for url in requested))
