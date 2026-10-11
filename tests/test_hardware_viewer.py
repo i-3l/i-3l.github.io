@@ -122,6 +122,46 @@ class HardwareViewerTests(unittest.TestCase):
         expect(self.page.get_by_role('button', name='Left arm', exact=True)).to_have_attribute('aria-pressed', 'true')
         self.assertEqual(initial, inputs.evaluate_all('(nodes) => nodes.map(n => n.value)'))
 
+    def test_crossbar_contacts_both_mounting_corners(self):
+        # Expose assembly only in the test response; use the shipped CAD meshes
+        # to measure physical contact, independently of the bar's dimensions.
+        source = (ROOT / 'static/js/hardware-scene.js').read_text()
+        self.page.route('**/hardware-scene.js', lambda route: route.fulfill(
+            body=source + '\nexport { assembleLeaders };', content_type='text/javascript'))
+        self.page.goto(self.url)
+        contacts = self.page.evaluate('''async () => {
+            const THREE = await import('/static/js/vendor/three/three.module.min.js');
+            const { GLTFLoader } = await import('/static/js/vendor/three/GLTFLoader.js');
+            const { MeshoptDecoder } = await import('/static/js/vendor/meshopt/meshopt_decoder.module.js');
+            const { assembleLeaders } = await import('/static/js/hardware-scene.js');
+            const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+            const { scene } = await loader.loadAsync('/static/models/joylo-r1pro.glb');
+            const model = assembleLeaders(scene, 'r1pro');
+            model.updateMatrixWorld(true);
+            const bar = new THREE.Box3().setFromObject(model.children.find(node => node.isMesh));
+            const contacts = [], inset = 0.01;
+            for (const leader of model.children.filter(node => node.userData.arm)) {
+                const side = leader.userData.arm === 'left' ? -1 : 1;
+                const end = side < 0 ? bar.min.x : bar.max.x;
+                const origin = new THREE.Vector3(end - side * inset, 0, bar.min.z + inset);
+                const bracket = leader.getObjectByName('1');
+                for (const [face, direction] of [
+                    ['rear plate', new THREE.Vector3(0, 0, -1)],
+                    ['side flange', new THREE.Vector3(side, 0, 0)]
+                ]) {
+                    const hit = new THREE.Raycaster(origin, direction).intersectObject(bracket, true)[0];
+                    contacts.push({ arm: leader.userData.arm, face, gap: hit ? hit.distance - inset : null });
+                }
+            }
+            return contacts;
+        }''')
+        self.assertEqual(len(contacts), 4)
+        for contact in contacts:
+            with self.subTest(arm=contact['arm'], face=contact['face']):
+                self.assertIsNotNone(contact['gap'], 'Bar misses the mounting face')
+                # Ten micrometres allow for the exported mesh quantization.
+                self.assertAlmostEqual(contact['gap'], 0, delta=0.00001)
+
     def test_orbit_zoom_keyboard_rotation_and_print(self):
         self.page.emulate_media(reduced_motion='reduce')
         canvas = self.load()
