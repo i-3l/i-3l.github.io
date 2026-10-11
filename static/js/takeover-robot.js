@@ -4,7 +4,7 @@ import * as THREE from './vendor/three/three.module.min.js';
 import { OrbitControls } from './vendor/three/OrbitControls.js';
 import { GLTFLoader } from './vendor/three/GLTFLoader.js';
 import { MeshoptDecoder } from './vendor/meshopt/meshopt_decoder.module.js';
-import { createLeaderInset } from './takeover-joylo.js';
+import { createLeaderInset } from './takeover-joylo.js?v=4';
 
 // Column order of the joint tracks written by scripts/export_takeovers.py.
 const COLUMNS = [
@@ -62,6 +62,7 @@ export async function createRobotView(host, { modelUrl, leaderUrl, policyColor, 
 
   let track = null, columns = 0, scale = 1, frame = -1, rendered = false, visible = true;
   let leader = null, taskVersion = 0;
+  const bodyOrientation = new THREE.Quaternion();
   const resetButton = host.querySelector('.takeover-robot-reset');
   const leaderHost = host.querySelector('.takeover-leader');
   const leaderStatus = leaderHost.querySelector('.takeover-leader-status');
@@ -70,7 +71,10 @@ export async function createRobotView(host, { modelUrl, leaderUrl, policyColor, 
     if (!visible || document.hidden) { rendered = false; return; }
     renderer.setViewport(0, 0, host.clientWidth, host.clientHeight);
     renderer.render(scene, camera);
-    if (leader && track) leader.render(renderer);
+    if (leader && track) {
+      joints.torso_link4.node.getWorldQuaternion(bodyOrientation);
+      leader.render(renderer, camera, bodyOrientation);
+    }
     rendered = true;
   }
   function setJoint(joint, value) {

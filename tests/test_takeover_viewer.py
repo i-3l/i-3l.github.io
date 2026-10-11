@@ -148,6 +148,82 @@ class TakeoverViewerTests(unittest.TestCase):
             self.assertLess(inset_box['y'] + inset_box['height'], panel_box['y'] + panel_box['height'])
             self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
 
+    def test_inset_follows_robot_heading_orbit_and_reset(self):
+        # Inspect the two scenes actually drawn by the shared renderer.
+        source = (ROOT / 'static/js/takeover-robot.js').read_text()
+        source = source.replace('host.prepend(canvas);', '''host.prepend(canvas);
+          const draw = renderer.render.bind(renderer);
+          window.takeoverViews = {};
+          renderer.render = (scene, camera) => {
+            window.takeoverViews[camera.isOrthographicCamera ? 'leader' : 'robot'] = { scene, camera };
+            draw(scene, camera);
+          };''')
+        self.context.route('**/takeover-robot.js*', lambda route: route.fulfill(
+            body=source, content_type='text/javascript'))
+        leader = self.load()
+        expect(leader).to_have_attribute('data-state', 'ready', timeout=30000)
+
+        def alignment():
+            state = self.page.evaluate('''async () => {
+                const THREE = await import('./static/js/vendor/three/three.module.min.js');
+                const { robot, leader } = window.takeoverViews;
+                const body = robot.scene.getObjectByName('torso_link4');
+                const assembly = leader.scene.children.find(node => node.isGroup);
+                const bodyRotation = body.getWorldQuaternion(new THREE.Quaternion());
+                const leaderRotation = assembly.getWorldQuaternion(new THREE.Quaternion());
+                const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(leaderRotation);
+                const robotForward = new THREE.Vector3(1, 0, 0).applyQuaternion(bodyRotation);
+                const left = assembly.children.find(node => node.userData.arm === 'left');
+                const right = assembly.children.find(node => node.userData.arm === 'right');
+                const span = left.getWorldPosition(new THREE.Vector3()).sub(right.getWorldPosition(new THREE.Vector3())).normalize();
+                const robotSpan = robot.scene.getObjectByName('left_arm_link1').getWorldPosition(new THREE.Vector3())
+                    .sub(robot.scene.getObjectByName('right_arm_link1').getWorldPosition(new THREE.Vector3())).normalize();
+                const point = new THREE.Vector3();
+                let extent = 0;
+                leader.scene.traverse(mesh => {
+                    if (!mesh.isMesh) return;
+                    if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+                    const b = mesh.geometry.boundingBox;
+                    for (let i = 0; i < 8; i++) {
+                        point.set(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z)
+                            .applyMatrix4(mesh.matrixWorld).project(leader.camera);
+                        extent = Math.max(extent, Math.abs(point.x), Math.abs(point.y));
+                    }
+                });
+                return { cameraError: robot.camera.quaternion.angleTo(leader.camera.quaternion),
+                    forward: forward.dot(robotForward), left: span.dot(robotSpan), extent,
+                    camera: robot.camera.quaternion.toArray(), body: bodyRotation.toArray() };
+            }''')
+            self.assertLess(state['cameraError'], 1e-6)
+            self.assertGreater(state['forward'], 0.999999)
+            self.assertGreater(state['left'], 0.999999)
+            self.assertLess(state['extent'], 1)
+            return state
+
+        self.seek(100)
+        initial = alignment()
+        inset = leader.locator('.takeover-leader-viewport')
+        before = inset.screenshot()
+        canvas = self.page.locator('.takeover-robot canvas')
+        box = canvas.bounding_box()
+        # Orbit while paused: the inset must change without advancing the episode.
+        for dx, dy in [(120, 0), (0, -100), (-220, 80)]:
+            self.page.mouse.move(box['x'] + box['width'] / 2, box['y'] + box['height'] / 3)
+            self.page.mouse.down()
+            self.page.mouse.move(box['x'] + box['width'] / 2 + dx, box['y'] + box['height'] / 3 + dy, steps=8)
+            self.page.mouse.up()
+            alignment()
+            expect(leader).to_have_attribute('data-frame', '100')
+        self.assertNotEqual(initial['camera'], alignment()['camera'])
+        self.assertNotEqual(before, inset.screenshot())
+        self.page.get_by_role('button', name='Reset view', exact=True).click()
+        reset = alignment()
+        for value, expected in zip(reset['camera'], initial['camera']):
+            self.assertAlmostEqual(value, expected, places=6)
+        for frame in (400, 900, 1600):
+            self.seek(frame)
+            alignment()
+
     def test_leader_failure_keeps_video_and_robot_usable(self):
         self.context.route('**/joylo-r1pro.glb', lambda route: route.abort())
         leader = self.load()

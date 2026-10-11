@@ -9,6 +9,8 @@ const ARMS = [
   { name: 'left', column: 4, signs: [1, -1, -1, 1, -1, -1, 1] },
   { name: 'right', column: 11, signs: [1, 1, 1, 1, 1, 1, -1] },
 ];
+// JoyLo+ faces -Z with its left leader on -X; the robot faces +X with its left arm on -Z.
+const CAD_TO_ROBOT = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2);
 
 export async function createLeaderInset(host, loader, modelUrl) {
   const scene = new THREE.Scene();
@@ -36,12 +38,12 @@ export async function createLeaderInset(host, loader, modelUrl) {
     }
     return { ...spec, joints };
   });
-  // Fixed framing avoids camera motion as the arms move. Orbiting the R1 view
-  // leaves this small front view in place, like a picture-in-picture video.
-  const halfHeight = 0.32;
+  // Keep a constant scale while allowing front, side, rear, and overhead views.
+  // This frame encloses the recorded arm poses from every viewing direction.
+  const halfHeight = 0.45;
   const camera = new THREE.OrthographicCamera(-0.43, 0.43, halfHeight, -halfHeight, 0.01, 5);
-  camera.position.set(0.36, 0.25, 1.1);
-  camera.lookAt(0.04, -0.10, 0);
+  const center = new THREE.Vector3(0, -0.10, -0.10);
+  const target = new THREE.Vector3();
   const rotation = new THREE.Quaternion();
   let viewport = null;
 
@@ -62,8 +64,14 @@ export async function createLeaderInset(host, loader, modelUrl) {
       camera.right = -camera.left;
       camera.updateProjectionMatrix();
     },
-    render(renderer) {
+    render(renderer, robotCamera, bodyOrientation) {
       if (!viewport || !viewport.width || !viewport.height) return;
+      // Follow the robot's upper body as well as the shared orbit view. Only
+      // orientation is shared; the inset keeps its own centered framing/scale.
+      leaders.quaternion.copy(bodyOrientation).multiply(CAD_TO_ROBOT);
+      target.copy(center).applyQuaternion(leaders.quaternion);
+      robotCamera.getWorldQuaternion(camera.quaternion);
+      camera.position.set(0, 0, 1.5).applyQuaternion(camera.quaternion).add(target);
       const { x, y, width, height } = viewport;
       // Share the R1 renderer and frame clock; no second WebGL context or loop.
       renderer.setViewport(x, y, width, height);

@@ -89,7 +89,8 @@ activation shares are the printed labels of Fig. 6.
   (including for the simulation episode). `takeover-joylo.js` converts robot angles
   with the R1 Pro controller's encoder signs and right-arm reflection; the geometric
   assembly is shared with the hardware explorer in `joylo-assembly.js`. The inset
-  uses a fixed camera and the existing renderer/frame clock. If its model fails to
+  follows the robot camera and upper-body orientation at a fixed scale, using the
+  existing renderer/frame clock. If its model fails to
   load, the robot and video continue without it.
 
 Original images and tables remain readable with JavaScript disabled. Printing
