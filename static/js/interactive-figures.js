@@ -100,6 +100,12 @@
     if (!event.target.closest?.("[aria-describedby='viz-tip']")) activeClear?.();
   });
   window.addEventListener("scroll", () => { if (!tip.hidden && !tipOwner?.matches(":hover, :focus")) activeClear?.(); }, { passive: true });
+  // The overview becomes static images with inline descriptions on touch/narrow screens.
+  // Dismiss a desktop tooltip if a resize or orientation change hides its hotspot.
+  const staticOverview = matchMedia("(max-width: 600px), (hover: none) and (pointer: coarse)");
+  staticOverview.addEventListener("change", () => {
+    if (staticOverview.matches && tipOwner?.closest(".teaser-overview")) activeClear?.();
+  });
 
   /* Dims every [data-key] mark except those matching `key`; null falls back to the pinned legend entry. */
   function highlight(root, key) {

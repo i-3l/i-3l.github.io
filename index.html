@@ -26,14 +26,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css?v=20261011-mobile-overview">
   <link rel="stylesheet" href="./static/css/interactive-figures.css">
-  <link rel="stylesheet" href="./static/css/teaser-mobile.css?v=20261011-caption-below">
+  <link rel="stylesheet" href="./static/css/teaser-mobile.css?v=20261011-inline-descriptions">
   <link rel="stylesheet" href="./static/css/hardware-viewer.css?v=20261011-simple-viewer">
   <link rel="stylesheet" href="./static/css/takeovers.css?v=3">
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script defer src="./static/js/figure-config.js"></script>
   <script defer src="./static/js/takeover-data.js?v=2"></script>
   <script defer src="./static/js/takeovers.js?v=4"></script>
-  <script defer src="./static/js/interactive-figures.js"></script>
+  <script defer src="./static/js/interactive-figures.js?v=20261011-inline-descriptions"></script>
   <script defer src="./static/js/analytics.js" data-endpoint="https://i3l-metrics.i3l-anonymous.workers.dev/collect"></script>
   <script defer src="./static/js/hardware-viewer.js"></script>
   <script defer src="./static/js/rollouts.js"></script>
@@ -65,10 +65,19 @@
     <div class="teaser-overview">
       <img class="teaser-image" src="./static/images/teaser.jpg"
            alt="I3L overview: operator takes over with JoyLo+, corrections are aggregated for retraining, and representative tasks and embodiments.">
-      <div class="teaser-mobile-fallback">
-        <div class="teaser-mobile-panel" role="img" aria-label="Whole-body corrections with JoyLo+: an operator guides the leader arms to correct the mobile robot."></div>
-        <div class="teaser-mobile-panel" role="img" aria-label="Iterative corrective learning: collect human corrections, retrain with prior demonstrations, and redeploy the policy."></div>
-        <div class="teaser-mobile-panel" role="img" aria-label="Diverse manipulation tasks across three robot embodiments."></div>
+      <div class="teaser-mobile-panels">
+        <figure class="teaser-mobile-item">
+          <div class="teaser-mobile-panel" role="img" aria-label="Whole-body corrections with JoyLo+: an operator guides the leader arms to correct the mobile robot."></div>
+          <figcaption>As the policy nears a failure, the operator grasps JoyLo+ and corrects the arms, torso, and base together.</figcaption>
+        </figure>
+        <figure class="teaser-mobile-item">
+          <div class="teaser-mobile-panel" role="img" aria-label="Iterative corrective learning: collect human corrections, retrain with prior demonstrations, and redeploy the policy."></div>
+          <figcaption>Corrections are aggregated with prior demonstrations, the policy is retrained, and the new policy is redeployed.</figcaption>
+        </figure>
+        <figure class="teaser-mobile-item">
+          <div class="teaser-mobile-panel" role="img" aria-label="Diverse manipulation tasks across three robot embodiments."></div>
+          <figcaption>Three robots across simulated and real-world tasks.</figcaption>
+        </figure>
       </div>
       <p class="teaser-caption">
         <strong>I3L couples interactive correction with iterative policy refinement.</strong>
