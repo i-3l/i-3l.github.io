@@ -24,7 +24,7 @@
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="stylesheet" href="./static/css/index.css?v=20261011-study-layout">
   <link rel="stylesheet" href="./static/css/interactive-figures.css">
   <link rel="stylesheet" href="./static/css/hardware-viewer.css">
   <link rel="stylesheet" href="./static/css/takeovers.css?v=3">
@@ -478,54 +478,50 @@
 </div>
 
 <div class="rows">
-  <div class="container is-max-desktop">
+  <div class="container is-max-desktop study-section" id="whole-body-corrections">
     <h2 class="title is-3">Corrections Span the Whole Body</h2>
-    <div class="columns is-vcentered">
-      <div class="column is-half">
-        <img class="method-image" src="./static/images/whole_body_takeover.png" alt="Body-part activation shares during JoyLo+ corrections.">
-        <p class="figure-caption">
-          <strong>Body-part activation shares during JoyLo+ corrections</strong>, pooled over four rounds. Each part gets
-          one vote per takeover segment once active for three consecutive frames.
-        </p>
-      </div>
-      <div class="column is-half">
-        <div class="content has-text-justified">
-          <p>
-            The leaders drive both arms while the JoyCon drives the torso and base, so a single takeover can coordinate the
-            whole robot.
-          </p>
-          <p>
-            Operators use this: on every task, a large share of corrections move the base rather than only the arms.
-          </p>
-        </div>
-      </div>
+    <div class="content study-intro">
+      <p>
+        The leaders drive both arms while the JoyCon drives the torso and base, so a single takeover can coordinate the
+        whole robot.
+      </p>
+    </div>
+    <div class="study-figure">
+      <img class="method-image" src="./static/images/whole_body_takeover.png" alt="Body-part activation shares during JoyLo+ corrections.">
+      <p class="figure-caption">
+        <strong>Body-part activation shares during JoyLo+ corrections</strong>, pooled over four rounds. Each part gets
+        one vote per takeover segment once active for three consecutive frames.
+      </p>
+    </div>
+    <div class="content study-summary">
+      <p>
+        Operators use this: on every task, a large share of corrections move the base rather than only the arms.
+      </p>
     </div>
   </div>
 </div>
 
 <div class="rows">
-  <div class="container is-max-desktop">
+  <div class="container is-max-desktop study-section" id="operator-study">
     <h2 class="title is-3">Operator Study</h2>
-    <div class="columns is-vcentered">
-      <div class="column is-half">
-        <img class="method-image" src="./static/images/operator_study.png" alt="Operator study on Franka mug hanging across three teleoperators.">
-        <p class="figure-caption">
-          <strong>Operator study on Franka mug hanging.</strong> (a) Cumulative fraction of timesteps under human control.
-          (b) Cumulative takeover-free episode counts.
-        </p>
-      </div>
-      <div class="column is-half">
-        <div class="content has-text-justified">
-          <p>
-            Three operators with different teleoperation experience each run three correction rounds of 25 episodes on
-            Franka Mug Hanging, each refining their own policy.
-          </p>
-          <p>
-            Intervention burden falls and takeover-free episodes accumulate for every operator, so the gains from I3L do not
-            depend on a single expert.
-          </p>
-        </div>
-      </div>
+    <div class="content study-intro">
+      <p>
+        Three operators with different teleoperation experience each run three correction rounds of 25 episodes on
+        Franka Mug Hanging, each refining their own policy.
+      </p>
+    </div>
+    <div class="study-figure">
+      <img class="method-image" src="./static/images/operator_study.png" alt="Operator study on Franka mug hanging across three teleoperators.">
+      <p class="figure-caption">
+        <strong>Operator study on Franka mug hanging.</strong> (a) Cumulative fraction of timesteps under human control.
+        (b) Cumulative takeover-free episode counts.
+      </p>
+    </div>
+    <div class="content study-summary">
+      <p>
+        Intervention burden falls and takeover-free episodes accumulate for every operator, so the gains from I3L do not
+        depend on a single expert.
+      </p>
     </div>
   </div>
 </div>

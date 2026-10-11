@@ -206,6 +206,45 @@ h1.title.publication-title {
   color: #363636;
 }
 
+/* Research results: introduction, figure, caption, then interpretation. */
+.study-section .title {
+  margin-bottom: 1rem;
+}
+
+.study-intro,
+.study-figure,
+.study-summary {
+  max-width: 820px;
+  margin-inline: auto;
+}
+
+.study-intro,
+.study-summary {
+  text-align: left;
+  line-height: 1.65;
+}
+
+.study-intro.content {
+  margin-bottom: 1.25rem;
+}
+
+.study-figure .figure-caption {
+  margin-top: 0.65rem;
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.study-figure .figure-info {
+  min-height: 0;
+}
+
+.study-summary {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e8e3de;
+}
+
 .subsection-heading {
   font-size: 1.25rem;
   font-weight: 600;
