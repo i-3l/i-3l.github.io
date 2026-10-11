@@ -82,6 +82,15 @@ activation shares are the printed labels of Fig. 6.
   welds, decimates, rebuilds the joint tree and, with Node 18+ on PATH, meshopt-compresses with
   gltfpack). The USDA's JPEG texture atlases must sit in a `materials/` folder beside it; the
   CAD normals are unreliable, so the viewer shades per face.
+- **JoyLo+ episode inset:** the lower-right corner of the R1 panel shows both leader
+  arms, synchronized to the same recorded robot joint track. A blue Policy border
+  becomes orange with a Takeover label at the annotated intervention frames. This
+  is a visualization derived from robot-arm poses, not measured leader telemetry
+  (including for the simulation episode). `takeover-joylo.js` converts robot angles
+  with the R1 Pro controller's encoder signs and right-arm reflection; the geometric
+  assembly is shared with the hardware explorer in `joylo-assembly.js`. The inset
+  uses a fixed camera and the existing renderer/frame clock. If its model fails to
+  load, the robot and video continue without it.
 
 Original images and tables remain readable with JavaScript disabled. Printing
 shows the original figures and published tables.

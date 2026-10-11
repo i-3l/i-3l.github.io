@@ -27,11 +27,11 @@
   <link rel="stylesheet" href="./static/css/index.css">
   <link rel="stylesheet" href="./static/css/interactive-figures.css">
   <link rel="stylesheet" href="./static/css/hardware-viewer.css">
-  <link rel="stylesheet" href="./static/css/takeovers.css?v=2">
+  <link rel="stylesheet" href="./static/css/takeovers.css?v=3">
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script defer src="./static/js/figure-config.js"></script>
   <script defer src="./static/js/takeover-data.js?v=2"></script>
-  <script defer src="./static/js/takeovers.js?v=2"></script>
+  <script defer src="./static/js/takeovers.js?v=3"></script>
   <script defer src="./static/js/interactive-figures.js"></script>
   <script defer src="./static/js/analytics.js" data-endpoint="https://i3l-metrics.i3l-anonymous.workers.dev/collect"></script>
   <script defer src="./static/js/hardware-viewer.js"></script>
@@ -429,7 +429,8 @@
         <p>
           Example episodes with human takeover and correction. The policy drives the robot
           until the operator takes over through JoyLo+. The top-left badge, the robot's floor disc, and the timeline show what is
-          controlling the robot at every frame. Click or drag the timeline to seek.
+          controlling the robot at every frame. The JoyLo+ inset mirrors the recorded robot-arm poses, with an orange border
+          during takeover. Click or drag the timeline to seek.
         </p>
       </div>
       <div class="takeover-tabs" role="tablist" aria-label="Task"></div>
@@ -446,6 +447,11 @@
         <div class="takeover-robot" data-state="idle" aria-label="3D view of the robot's recorded joint state">
           <span class="takeover-robot-label">3D pose · drag to orbit</span>
           <button type="button" class="takeover-robot-reset" hidden>Reset view</button>
+          <div class="takeover-leader" data-state="loading" hidden role="img"
+               aria-label="JoyLo+ pose preview from recorded robot-arm joints">
+            <div class="takeover-leader-heading"><strong>JoyLo+</strong><span class="takeover-leader-status">Policy</span></div>
+            <div class="takeover-leader-viewport"></div>
+          </div>
         </div>
       </div>
       <div class="takeover-controls">

@@ -76,7 +76,20 @@
     video.playbackRate = speed;
     buildTimeline();
     update();
-    if (robot) robot.setTask(task).then(() => { if (robot) robot.update(Math.max(0, currentFrame()), inTakeover(currentFrame()) >= 0); });
+    if (robot) {
+      const selectedTask = task;
+      robot.setTask(task).then(() => {
+        if (task === selectedTask) {
+          root.classList.remove('no-robot');
+          robot.update(Math.max(0, currentFrame()), inTakeover(currentFrame()) >= 0);
+        }
+      }).catch(error => {
+        if (task === selectedTask) {
+          root.classList.add('no-robot');
+          console.warn('Episode pose unavailable:', error);
+        }
+      });
+    }
     if (visible && !userPaused) video.play().catch(() => {});
   }
 
@@ -209,13 +222,18 @@
     if (robotHost.dataset.state !== 'idle') return;
     robotHost.dataset.state = 'loading';
     try {
-      const { createRobotView } = await import('./takeover-robot.js?v=2');
+      const { createRobotView } = await import('./takeover-robot.js?v=3');
       const view = await createRobotView(robotHost, {
         modelUrl: './static/models/r1pro.glb',
+        leaderUrl: './static/models/joylo-r1pro.glb',
         policyColor: styles.getPropertyValue('--policy').trim() || '#5b7db1',
         takeoverColor: styles.getPropertyValue('--takeover').trim() || '#C45B28',
       });
-      await view.setTask(task);
+      let selectedTask;
+      do {
+        selectedTask = task;
+        await view.setTask(selectedTask);
+      } while (task !== selectedTask);
       robot = view;
       robotHost.dataset.state = 'ready';
       const frame = Math.max(0, currentFrame());
