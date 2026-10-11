@@ -380,6 +380,7 @@ table.bom-table .total-row td:nth-last-child(2) {
   color: var(--i3l-orange);
 }
 
+table.bom-table { width: 100%; }
 table.bom-table th[scope="colgroup"] { text-align: center; }
 table.bom-table thead tr:last-child th { text-align: right; }
 
