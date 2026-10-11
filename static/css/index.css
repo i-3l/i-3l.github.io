@@ -336,9 +336,13 @@ table.results-table .total-row td {
   padding-top: 0.55rem;
 }
 
-table.results-table .total-row td:last-child {
+table.results-table .total-row td:last-child,
+table.bom-table .total-row td:nth-last-child(2) {
   color: var(--i3l-orange);
 }
+
+table.bom-table th[scope="colgroup"] { text-align: center; }
+table.bom-table thead tr:last-child th { text-align: right; }
 
 table.results-table td a {
   color: inherit;
