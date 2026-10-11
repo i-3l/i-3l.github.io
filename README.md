@@ -175,7 +175,18 @@ mesh buffers but have independent joint transforms. The 0.24 m mount spacing
 and connecting bar are illustrative, not calibrated assembly dimensions. Model
 downloads remain the original individual leader exports.
 
-To regenerate from updated CAD, run from this website directory:
+The BOM also offers separate ZIP downloads of the custom link and grip STL
+files for each single-arm leader. These use millimetres for slicer imports and
+include a part list with quantities and dimensions. The archives exclude servo
+assemblies, hinges, electronics, fasteners and the illustrative bimanual bar.
+They preserve the source triangles and orientations; print settings and supports
+must be selected in the slicer. Regenerate these downloads with:
+
+```sh
+python3 scripts/export_printable_parts.py ../FrankaTrain/I3L/assets
+```
+
+To regenerate the viewer models from updated CAD, run from this website directory:
 
 ```sh
 python3 scripts/export_hardware.py ../FrankaTrain/I3L/assets
