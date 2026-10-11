@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css?v=20261011-bom-width">
   <link rel="stylesheet" href="./static/css/interactive-figures.css">
-  <link rel="stylesheet" href="./static/css/hardware-viewer.css">
+  <link rel="stylesheet" href="./static/css/hardware-viewer.css?v=20261011-simple-viewer">
   <link rel="stylesheet" href="./static/css/takeovers.css?v=3">
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script defer src="./static/js/figure-config.js"></script>
@@ -109,22 +109,21 @@
     <h2 id="hardware" class="title is-3">JoyLo+: A Hardware Interface for Policy Intervention</h2>
     <div class="hardware-viewer" id="hardware-viewer" aria-labelledby="hardware-viewer-title" data-state="idle">
       <div class="hardware-header">
-        <div>
-          <p class="hardware-eyebrow">Inside JoyLo+</p>
-          <h3 id="hardware-viewer-title">Explore the device</h3>
-        </div>
+        <h3 id="hardware-viewer-title">Explore the device</h3>
         <div class="hardware-models" role="group" aria-label="Leader configuration" hidden>
           <button type="button" data-model="r1pro" aria-pressed="true">R1 Pro bimanual</button>
           <button type="button" data-model="franka" aria-pressed="false">Franka leader</button>
         </div>
       </div>
       <div class="hardware-layout">
-        <div class="hardware-stage">
-          <div class="hardware-canvas" id="hardware-canvas"></div>
-          <div class="hardware-stage-label" aria-hidden="true"><span class="hardware-dot"></span><span id="hardware-model-label">R1 Pro bimanual leaders · 14 joints</span></div>
-          <div class="hardware-placeholder" id="hardware-placeholder">
-            <p id="hardware-status" role="status">Explore the leader arms in 3D. The hardware overview is available below.</p>
-            <button type="button" id="hardware-load" hidden>Load 3D viewer</button>
+        <div class="hardware-preview">
+          <div class="hardware-stage">
+            <div class="hardware-canvas" id="hardware-canvas"></div>
+            <div class="hardware-stage-label" aria-hidden="true"><span id="hardware-model-label">R1 Pro bimanual leaders · 14 joints</span></div>
+            <div class="hardware-placeholder" id="hardware-placeholder">
+              <p id="hardware-status" role="status">Explore the leader arms in 3D. The hardware overview is available below.</p>
+              <button type="button" id="hardware-load" hidden>Load 3D viewer</button>
+            </div>
           </div>
           <div class="hardware-camera-controls" role="group" aria-label="3D camera controls" hidden>
             <button type="button" data-view="in" aria-label="Zoom in">+</button>
@@ -134,7 +133,6 @@
           </div>
         </div>
         <div class="hardware-sidebar">
-          <p class="hardware-eyebrow">Articulated leaders</p>
           <h4 id="hardware-model-title">R1 Pro JoyLo+</h4>
           <p id="hardware-model-description">Explore both seven-joint leaders. Select an arm to move its joints independently.</p>
           <fieldset class="hardware-joints" id="hardware-joints" hidden>
@@ -151,7 +149,7 @@
       </div>
       <div class="hardware-footer">
         <p id="hardware-help">Drag to orbit · Scroll or pinch to zoom<br><span>Keyboard: focus the model, then use arrows to orbit, +/− to zoom, or 0 to fit.</span></p>
-        <div class="hardware-downloads"><span>Download individual leader models</span><a href="./static/models/joylo-r1pro.glb" download>R1 Pro</a><a href="./static/models/joylo-franka.glb" download>Franka</a></div>
+        <div class="hardware-downloads"><span>Download models:</span><a href="./static/models/joylo-r1pro.glb" download>R1 Pro</a><a href="./static/models/joylo-franka.glb" download>Franka</a></div>
       </div>
     </div>
     <img class="method-image" src="./static/images/hardware.jpeg" alt="JoyLo+ correction interface in single-arm (Franka) and dual-arm (R1 Pro) configurations.">
