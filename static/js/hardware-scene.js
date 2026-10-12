@@ -3,6 +3,7 @@ import { OrbitControls } from './vendor/three/OrbitControls.js';
 import { GLTFLoader } from './vendor/three/GLTFLoader.js';
 import { MeshoptDecoder } from './vendor/meshopt/meshopt_decoder.module.js';
 import { assembleLeaders } from './joylo-assembly.js';
+import { createHardwareRobot } from './hardware-robot.js';
 
 const models = {
   r1pro: { title: 'R1 Pro JoyLo+', label: 'R1 Pro bimanual leaders', pose: [0, -20, 0, -50, 0, 0, 0],
@@ -32,6 +33,8 @@ export async function createHardwareViewer(root) {
   const jointControls = root.querySelector('#hardware-joint-controls');
   const armControls = root.querySelector('#hardware-arm-controls');
   const armButtons = [...armControls.querySelectorAll('[data-arm]')];
+  const robotHost = root.querySelector('.hardware-robot');
+  const robotViewport = robotHost.querySelector('.hardware-robot-viewport');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
@@ -58,6 +61,8 @@ export async function createHardwareViewer(root) {
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   let model, selected, joints = [], frame = 0, visible = true, printing = false;
   let busy = false, destroyed = false, fittedDistance = 1, previousTime = 0;
+  const robotPreviews = new Map(), robotLoads = new Map();
+  let mainViewport = { width: 1, height: 1, y: 0 };
   const notice = document.createElement('p');
   notice.className = 'hardware-joint-note';
   notice.setAttribute('role', 'status');
@@ -65,7 +70,43 @@ export async function createHardwareViewer(root) {
   root.querySelector('#hardware-model-description').after(notice);
 
   function render() {
-    if (!destroyed && !document.hidden && !printing && visible) renderer.render(scene, camera);
+    if (destroyed || document.hidden || printing || !visible) return;
+    renderer.setViewport(0, mainViewport.y, mainViewport.width, mainViewport.height);
+    renderer.render(scene, camera);
+    robotPreviews.get(selected)?.render(renderer, camera);
+  }
+
+  async function syncRobot() {
+    const key = selected, label = key === 'r1pro' ? 'R1 Pro' : 'Franka';
+    robotHost.hidden = false;
+    robotHost.dataset.model = key;
+    robotHost.dataset.state = robotPreviews.has(key) ? 'ready' : 'loading';
+    robotHost.querySelector('.hardware-robot-heading').textContent = label;
+    robotHost.setAttribute('aria-label', `${label} robot pose following the JoyLo+ joint controls`);
+    resize();
+    try {
+      if (!robotPreviews.has(key)) {
+        if (!robotLoads.has(key)) robotLoads.set(key, createHardwareRobot(loader,
+          new URL(`../models/${key}.glb`, import.meta.url).href, key).then(preview => {
+          if (destroyed) { preview.dispose(); return; }
+          robotPreviews.set(key, preview);
+        }).finally(() => robotLoads.delete(key)));
+        await robotLoads.get(key);
+      }
+      if (destroyed || selected !== key) return;
+      const preview = robotPreviews.get(key);
+      joints.forEach(joint => preview.setJoint(joint.arm, joint.number, joint.angle, THREE.MathUtils.degToRad(joint.initial)));
+      robotHost.dataset.state = 'ready';
+      preview.resize(host, robotViewport);
+      render();
+    } catch (error) {
+      if (selected === key && !destroyed) {
+        robotHost.hidden = true;
+        robotHost.dataset.state = 'error';
+        resize();
+      }
+      console.warn('Robot pose preview unavailable:', error);
+    }
   }
 
   function animate(time) {
@@ -135,9 +176,17 @@ export async function createHardwareViewer(root) {
   function resize() {
     const width = host.clientWidth, height = host.clientHeight;
     if (!width || !height) return;
-    camera.aspect = width / height;
+    // Keep the main device clear of the inset. The wide bimanual assembly
+    // fits above it on phones; the upright Franka leader fits alongside it.
+    const inset = robotHost.getBoundingClientRect();
+    const beside = width >= 600 || selected === 'franka';
+    const mainWidth = beside ? width - inset.width - 16 : width;
+    const mainHeight = beside ? height : height - Math.max(0, inset.height - 16);
+    mainViewport = { width: Math.max(1, mainWidth), height: Math.max(1, mainHeight - 48), y: height - mainHeight };
+    camera.aspect = mainViewport.width / mainViewport.height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    robotPreviews.get(selected)?.resize(host, robotViewport);
     fit();
   }
 
@@ -152,6 +201,8 @@ export async function createHardwareViewer(root) {
   function setJoint(joint, degrees) {
     const radians = THREE.MathUtils.clamp(THREE.MathUtils.degToRad(degrees), joint.lower, joint.upper);
     joint.node.quaternion.copy(joint.origin).multiply(new THREE.Quaternion().setFromAxisAngle(joint.axis, radians));
+    joint.angle = radians;
+    robotPreviews.get(selected)?.setJoint(joint.arm, joint.number, radians, THREE.MathUtils.degToRad(joint.initial));
     joint.input.value = String(THREE.MathUtils.radToDeg(radians));
     const label = `${Math.round(THREE.MathUtils.radToDeg(radians))}°`;
     joint.output.value = label;
@@ -239,7 +290,7 @@ export async function createHardwareViewer(root) {
       buildJoints();
       root.querySelector('#hardware-model-title').textContent = models[key].title;
       root.querySelector('#hardware-model-description').textContent = models[key].description;
-      root.querySelector('#hardware-model-label').textContent = `${models[key].label} · ${joints.length} joints`;
+      root.querySelector('#hardware-model-label').textContent = `JoyLo+ · ${joints.length} joints`;
       canvas.setAttribute('aria-label', `Interactive 3D model of the ${models[key].label}. Drag or use arrow keys to rotate.`);
       modelButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.model === key)));
       root.dataset.model = key;
@@ -250,6 +301,7 @@ export async function createHardwareViewer(root) {
       root.querySelector('#hardware-joints').hidden = false;
       placeholder.hidden = true;
       notice.textContent = `${models[key].label} loaded. ${joints.length} joints available.`;
+      syncRobot();
       fit();
     } catch (error) {
       window.I3LAnalytics?.track('viewer_error', { model: key, target: 'model_load', section: 'hardware' });
@@ -343,6 +395,7 @@ export async function createHardwareViewer(root) {
     resizeObserver.disconnect();
     controls.dispose();
     disposeModel(model);
+    robotPreviews.forEach(preview => preview.dispose());
     renderer.dispose();
   });
 }

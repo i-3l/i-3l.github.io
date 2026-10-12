@@ -98,5 +98,14 @@
     "output": "static/models/r1pro.glb",
     "output_sha256": "c112cbeb9ed3a1a14b6ac5bb2cb945c2be28cd6eb64c8982901f5b34ff43ded4",
     "bytes": 807336
+  },
+  "franka_robot": {
+    "source": "PyBullet franka_panda/panda.urdf",
+    "source_sha256": "9c27cf846302e26a1d3a44ccfd4dd2dbba89cccc9f17b96b6bd1f8bceedd1ff0",
+    "license": "Apache-2.0",
+    "output": "static/models/franka.glb",
+    "output_sha256": "1b8c78f36bfe1ed84b0bf41fe4dfef3d8eb88466eb8b6a7fb9d173945ede0677",
+    "bytes": 1446016,
+    "generator": "scripts/export_franka.py + gltfpack"
   }
 }

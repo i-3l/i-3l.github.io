@@ -28,6 +28,7 @@ This serves your local copy; publishing changes to GitHub Pages is a separate st
 - `static/css/hardware-viewer.css` — hardware section and responsive 3D viewer
 - `static/js/hardware-viewer.js` — lazy loading and startup fallback
 - `static/js/hardware-scene.js` — 3D rendering, joint articulation, and camera controls
+- `static/js/hardware-robot.js` — matching robot inset for the device explorer
 - `static/models/` — self-contained GLB models exported from the repository CAD
 - `static/images/` — figures exported from the paper
 - `static/videos/walkthrough.mp4` — walkthrough video (poster frame: `static/images/video_poster.jpg`)
@@ -148,6 +149,17 @@ leaders as the section approaches the viewport; Franka loads only when selected.
 R1 Pro shows a **bimanual pair with 14 independent joints**. Use Left arm / Right
 arm to choose which seven joints to adjust; both arms remain visible and retain
 their poses. Franka shows one seven-joint leader.
+The upper-right buttons inside the preview switch configurations. A lower-right
+robot inset follows the joint sliders, reset, and orbit direction using the same
+renderer. R1 Pro uses the inverse of the takeover leader mapping; Franka shows
+corresponding motion relative to the two home presets, bounded by the Panda joint
+limits. This is illustrative motion, not calibrated robot commands. Robot models
+load only with their corresponding device; an unavailable inset leaves the device
+controls usable. The Panda asset is converted from PyBullet's Apache-2.0 model;
+its source, modifications, and license are in `static/models/franka-NOTICE.txt`
+and `static/models/franka-LICENSE.txt`. Rebuild it with
+`python scripts/export_franka.py /path/to/pybullet_data/franka_panda --compress`
+(requires NumPy, trimesh, and Node >= 18 for gltfpack).
 Drag to orbit, right-drag to pan, and scroll or pinch to zoom. Camera buttons and
 keyboard controls provide alternatives: focus the canvas and use arrow keys to
 orbit, +/− to zoom, and 0/Home to fit. The seven labeled sliders move joints within

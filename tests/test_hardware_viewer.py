@@ -208,6 +208,90 @@ class HardwareViewerTests(unittest.TestCase):
         self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
         expect(canvas).to_be_visible()
 
+    def test_robot_preview_follows_joints_orbit_and_configuration(self):
+        # Observe the real render calls without adding a debug API to the site.
+        for module, name in [('hardware-scene.js', 'device'), ('hardware-robot.js', 'robot')]:
+            source = (ROOT / 'static/js' / module).read_text().replace(
+                'renderer.render(scene, camera);',
+                f'window.__{name}View = {{ scene, camera }}; renderer.render(scene, camera);')
+            self.page.route(f'**/{module}*', functools.partial(
+                lambda source, route: route.fulfill(body=source, content_type='text/javascript'), source))
+        canvas = self.load()
+        inset = self.page.locator('.hardware-robot')
+        viewport = inset.locator('.hardware-robot-viewport')
+        for model in ['r1pro', 'franka', 'r1pro']:
+            self.page.locator(f'button[data-model="{model}"]').click()
+            expect(inset).to_have_attribute('data-model', model)
+            expect(inset).to_have_attribute('data-state', 'ready', timeout=30000)
+            expect(self.page.locator('#hardware-canvas canvas')).to_have_count(1)
+            initial = viewport.screenshot()
+            for arm in (['Left', 'Right'] if model == 'r1pro' else ['']):
+                if arm:
+                    self.page.get_by_role('button', name=f'{arm} arm', exact=True).click()
+                before = viewport.screenshot()
+                self.page.get_by_label(f'{arm + " " if arm else ""}Joint 4', exact=True).evaluate(
+                    '(n) => { n.value = Number(n.value) - 25; n.dispatchEvent(new Event("input")); }')
+                self.assertNotEqual(before, viewport.screenshot())
+            self.page.get_by_role('button', name='Reset pose', exact=True).click()
+            self.assertEqual(initial, viewport.screenshot())
+            canvas.focus()
+            canvas.press('ArrowLeft')
+            self.assertNotEqual(initial, viewport.screenshot())
+            self.assertGreater(self.page.evaluate('''() => {
+                const a = window.__deviceView.camera.quaternion;
+                const b = window.__robotView.camera.quaternion;
+                return Math.abs(a.dot(b));
+            }'''), 0.999999)
+            self.page.get_by_role('button', name='Fit view', exact=True).click()
+            self.assertEqual(initial, viewport.screenshot())
+        for width in [320, 390, 768, 1440]:
+            self.page.set_viewport_size({'width': width, 'height': 900})
+            for model in ['r1pro', 'franka']:
+                self.page.locator(f'button[data-model="{model}"]').click()
+                expect(inset).to_have_attribute('data-model', model)
+                expect(inset).to_have_attribute('data-state', 'ready')
+                stage = self.page.locator('.hardware-stage').bounding_box()
+                tabs = self.page.locator('.hardware-models').bounding_box()
+                box = inset.bounding_box()
+                self.assertGreaterEqual(tabs['x'], stage['x'] + stage['width'] / 2)
+                self.assertLess(tabs['y'] - stage['y'], 15)
+                self.assertLess(abs(stage['x'] + stage['width'] - box['x'] - box['width']), 12)
+                self.assertLess(abs(stage['y'] + stage['height'] - box['y'] - box['height']), 12)
+                self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
+
+    def test_robot_preview_failure_keeps_controls_usable_and_retries(self):
+        self.page.route('**/models/r1pro.glb', lambda r: r.abort())
+        self.load()
+        inset = self.page.locator('.hardware-robot')
+        expect(inset).to_have_attribute('data-state', 'error')
+        expect(inset).to_be_hidden()
+        self.page.get_by_label('Left Joint 4', exact=True).fill('-75')
+        self.page.get_by_role('button', name='Franka leader', exact=True).click()
+        expect(inset).to_have_attribute('data-model', 'franka')
+        expect(inset).to_have_attribute('data-state', 'ready', timeout=30000)
+        self.page.unroute('**/models/r1pro.glb')
+        self.page.get_by_role('button', name='R1 Pro bimanual', exact=True).click()
+        expect(inset).to_have_attribute('data-model', 'r1pro')
+        expect(inset).to_have_attribute('data-state', 'ready', timeout=30000)
+
+    def test_delayed_robot_load_does_not_replace_selected_configuration(self):
+        held = []
+        self.page.route('**/models/r1pro.glb', lambda route: held.append(route))
+        self.load()
+        inset = self.page.locator('.hardware-robot')
+        expect(inset).to_have_attribute('data-state', 'loading')
+        self.page.get_by_role('button', name='Franka leader', exact=True).click()
+        expect(inset).to_have_attribute('data-model', 'franka')
+        expect(inset).to_have_attribute('data-state', 'ready', timeout=30000)
+        self.assertEqual(len(held), 1)
+        with self.page.expect_response('**/models/r1pro.glb'):
+            held[0].continue_()
+        expect(inset).to_have_attribute('data-model', 'franka')
+        expect(inset.locator('.hardware-robot-heading')).to_have_text('Franka')
+        self.page.get_by_role('button', name='R1 Pro bimanual', exact=True).click()
+        expect(inset).to_have_attribute('data-model', 'r1pro')
+        expect(inset).to_have_attribute('data-state', 'ready', timeout=30000)
+
     def test_model_failure_retry_and_failed_switch_preserves_current_model(self):
         self.page.route('**/joylo-r1pro.glb', lambda r: r.abort())
         self.page.goto(self.url + '#hardware')

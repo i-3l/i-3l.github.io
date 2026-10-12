@@ -1,0 +1,8 @@
+Franka Panda model
+
+Source: https://github.com/bulletphysics/bullet3/tree/master/examples/pybullet/gym/pybullet_data/franka_panda
+License: Apache License 2.0 (see franka-LICENSE.txt).
+
+Modified for this website: visual meshes and materials were converted to a
+self-contained glTF binary, the URDF joint hierarchy was retained, and
+collision and inertial data were omitted. Coordinates were changed to Y-up.
