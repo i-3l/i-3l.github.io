@@ -401,6 +401,29 @@ table.bom-table { width: 100%; }
 table.bom-table th[scope="colgroup"] { text-align: center; }
 table.bom-table thead tr:last-child th { text-align: right; }
 
+@media screen and (max-width: 600px) {
+  table.bom-table {
+    min-width: 0;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  table.bom-table th,
+  table.bom-table td {
+    padding: 0.55rem 0.25rem;
+  }
+
+  table.bom-table th,
+  table.bom-table td:first-child {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  table.bom-table small {
+    font-size: inherit;
+  }
+}
+
 table.results-table td a {
   color: inherit;
   text-decoration: underline;
