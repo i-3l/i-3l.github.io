@@ -4,7 +4,7 @@ import * as THREE from './vendor/three/three.module.min.js';
 import { OrbitControls } from './vendor/three/OrbitControls.js';
 import { GLTFLoader } from './vendor/three/GLTFLoader.js';
 import { MeshoptDecoder } from './vendor/meshopt/meshopt_decoder.module.js';
-import { createLeaderInset } from './takeover-joylo.js?v=4';
+import { createLeaderInset } from './takeover-joylo.js?v=5';
 
 // Column order of the joint tracks written by scripts/export_takeovers.py.
 const COLUMNS = [

@@ -2,8 +2,9 @@ import * as THREE from './vendor/three/three.module.min.js';
 import { OrbitControls } from './vendor/three/OrbitControls.js';
 import { GLTFLoader } from './vendor/three/GLTFLoader.js';
 import { MeshoptDecoder } from './vendor/meshopt/meshopt_decoder.module.js';
-import { assembleLeaders } from './joylo-assembly.js';
-import { createHardwareRobot } from './hardware-robot.js';
+import { assembleLeaders } from './joylo-assembly.js?v=20261011-franka-motion';
+import { createHardwareRobot } from './hardware-robot.js?v=20261011-franka-motion';
+import { frankaCadLimits } from './franka-joint-map.js';
 
 const models = {
   r1pro: { title: 'R1 Pro JoyLo+', label: 'R1 Pro bimanual leaders', pose: [0, -20, 0, -50, 0, 0, 0],
@@ -95,7 +96,7 @@ export async function createHardwareViewer(root) {
       }
       if (destroyed || selected !== key) return;
       const preview = robotPreviews.get(key);
-      joints.forEach(joint => preview.setJoint(joint.arm, joint.number, joint.angle, THREE.MathUtils.degToRad(joint.initial)));
+      joints.forEach(joint => preview.setJoint(joint.arm, joint.number, joint.angle));
       robotHost.dataset.state = 'ready';
       preview.resize(host, robotViewport);
       render();
@@ -182,7 +183,8 @@ export async function createHardwareViewer(root) {
     const beside = width >= 600 || selected === 'franka';
     const mainWidth = beside ? width - inset.width - 16 : width;
     const mainHeight = beside ? height : height - Math.max(0, inset.height - 16);
-    mainViewport = { width: Math.max(1, mainWidth), height: Math.max(1, mainHeight - 48), y: height - mainHeight };
+    const toolbarHeight = beside ? root.querySelector('.hardware-camera-controls').offsetHeight + 16 : 0;
+    mainViewport = { width: Math.max(1, mainWidth), height: Math.max(1, mainHeight - 48 - toolbarHeight), y: height - mainHeight + toolbarHeight };
     camera.aspect = mainViewport.width / mainViewport.height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
@@ -202,7 +204,7 @@ export async function createHardwareViewer(root) {
     const radians = THREE.MathUtils.clamp(THREE.MathUtils.degToRad(degrees), joint.lower, joint.upper);
     joint.node.quaternion.copy(joint.origin).multiply(new THREE.Quaternion().setFromAxisAngle(joint.axis, radians));
     joint.angle = radians;
-    robotPreviews.get(selected)?.setJoint(joint.arm, joint.number, radians, THREE.MathUtils.degToRad(joint.initial));
+    robotPreviews.get(selected)?.setJoint(joint.arm, joint.number, radians);
     joint.input.value = String(THREE.MathUtils.radToDeg(radians));
     const label = `${Math.round(THREE.MathUtils.radToDeg(radians))}°`;
     joint.output.value = label;
@@ -228,6 +230,7 @@ export async function createHardwareViewer(root) {
       armJoints.forEach((joint, index) => {
         joint.number = index + 1;
         joint.initial = models[selected].pose[index];
+        if (selected === 'franka') Object.assign(joint, frankaCadLimits(index, joint.lower, joint.upper));
       });
       joints.push(...armJoints);
     });

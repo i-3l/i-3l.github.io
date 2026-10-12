@@ -27,6 +27,8 @@
 
 .takeover-robot {
   position: relative;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
   border-radius: 6px;
   overflow: hidden;
@@ -358,5 +360,5 @@
   .takeover-track-overlay { left: 0; }
   .takeover-controls .takeover-legend { margin-left: 0; }
   .takeover-camera { display: none; }
-  .takeover-robot { display: none; }
+  .takeover-robot { aspect-ratio: 1; min-height: 320px; }
 }

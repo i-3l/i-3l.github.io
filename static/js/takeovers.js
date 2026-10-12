@@ -2,7 +2,7 @@
 // dataset's int_state labels (policy vs. human takeover) and annotated subtasks. The playhead,
 // live status badge, and a 3D robot posed from the recorded joint state follow the video; click or
 // drag the timeline to seek. The 3D view (takeover-robot.js and the model) loads only when the
-// section is near the viewport and the screen is wide enough to show it.
+// section is near the viewport, including on phones.
 (function () {
   'use strict';
   const root = document.getElementById('takeovers');
@@ -213,7 +213,7 @@
         else if (!visible && !video.paused) video.pause();
         if (robot) robot.setVisible(entry.isIntersecting);
       }
-    }, { threshold: [0, 0.35, 0.6] }).observe(video);
+    }, { threshold: [0, 0.35, 0.6] }).observe(root.querySelector('.takeover-stage-row'));
   }
 
   // 3D robot view: fetched once the section is near, and only where the panel is shown ---------
@@ -222,7 +222,7 @@
     if (robotHost.dataset.state !== 'idle') return;
     robotHost.dataset.state = 'loading';
     try {
-      const { createRobotView } = await import('./takeover-robot.js?v=4');
+      const { createRobotView } = await import('./takeover-robot.js?v=5');
       const view = await createRobotView(robotHost, {
         modelUrl: './static/models/r1pro.glb',
         leaderUrl: './static/models/joylo-r1pro.glb',
@@ -244,13 +244,13 @@
       console.warn('Takeover robot view unavailable:', error);
     }
   }
-  if (robotHost && 'IntersectionObserver' in window && window.matchMedia('(min-width: 601px)').matches) {
+  if (robotHost && 'IntersectionObserver' in window) {
     const near = new IntersectionObserver(entries => {
       if (entries.some(entry => entry.isIntersecting)) { near.disconnect(); startRobot(); }
     }, { rootMargin: '250px' });
     near.observe(root);
   } else if (robotHost) {
-    root.classList.add('no-robot');
+    startRobot();
   }
   window.addEventListener('resize', fitLabels);
 

@@ -1,14 +1,11 @@
 import * as THREE from './vendor/three/three.module.min.js';
+import { frankaRobotAngle } from './franka-joint-map.js';
 
 // Inverse of the robot-to-leader mapping used by the takeover illustration.
 const ARM_SIGNS = {
   left: [1, -1, -1, 1, -1, -1, 1],
   right: [1, 1, 1, 1, 1, 1, -1],
 };
-// Franka CAD angles include assembly offsets. Illustrate corresponding joint
-// motion relative to each model's home, not as calibrated motor commands.
-const FRANKA_HOME = [0, -45, 0, -135, 0, 90, 45].map(THREE.MathUtils.degToRad);
-const FRANKA_SIGNS = [1, 1, 1, -1, 1, -1, 1];
 
 export async function createHardwareRobot(loader, url, model) {
   const { scene: robot } = await loader.loadAsync(url);
@@ -21,7 +18,8 @@ export async function createHardwareRobot(loader, url, model) {
   fill.position.set(-3, 1.5, -2);
   scene.add(key, fill);
   // Robot +X forward / -Z left -> leader -Z forward / -X left.
-  robot.rotation.y = Math.PI / 2;
+  // The upright Franka CAD extends along +X; R1 leaders face -Z.
+  robot.rotation.y = model === 'franka' ? 0 : Math.PI / 2;
   scene.add(robot);
   const joints = {};
   robot.traverse(node => {
@@ -47,11 +45,11 @@ export async function createHardwareRobot(loader, url, model) {
   let viewport = null;
 
   return {
-    setJoint(arm, number, radians, initial) {
+    setJoint(arm, number, radians) {
       const joint = joints[model === 'franka' ? `panda_joint${number}` : `${arm}_arm_link${number}`];
       if (!joint) return;
       const angle = model === 'franka'
-        ? THREE.MathUtils.clamp(FRANKA_HOME[number - 1] + (radians - initial) * FRANKA_SIGNS[number - 1], joint.lower, joint.upper)
+        ? frankaRobotAngle(number - 1, radians)
         : radians * ARM_SIGNS[arm][number - 1];
       joint.node.quaternion.copy(joint.origin).multiply(
         rotation.setFromAxisAngle(joint.axis, angle));

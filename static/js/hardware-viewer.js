@@ -13,7 +13,7 @@
     status.textContent = 'Loading the interactive device…';
     button.hidden = true;
     try {
-      const { createHardwareViewer } = await import('./hardware-scene.js?v=20261011-robot-inset');
+      const { createHardwareViewer } = await import('./hardware-scene.js?v=20261011-franka-motion');
       await createHardwareViewer(root);
     } catch (error) {
       window.I3LAnalytics?.track('viewer_error', { target: 'startup', section: 'hardware' });

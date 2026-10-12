@@ -90,8 +90,9 @@ activation shares are the printed labels of Fig. 6.
   (including for the simulation episode). `takeover-joylo.js` converts robot angles
   with the R1 Pro controller's encoder signs and right-arm reflection; the geometric
   assembly is shared with the hardware explorer in `joylo-assembly.js`. The inset
-  follows the robot camera and upper-body orientation at a fixed scale, using the
-  existing renderer/frame clock. If its model fails to
+  follows the robot camera and upper-body orientation, fitting closely around the
+  current pose with padding for extended arms. The robot panel is also shown below
+  the video on phones. Both views use the existing renderer/frame clock. If its model fails to
   load, the robot and video continue without it.
 
 Original images and tables remain readable with JavaScript disabled. Printing
@@ -151,16 +152,20 @@ arm to choose which seven joints to adjust; both arms remain visible and retain
 their poses. Franka shows one seven-joint leader.
 The upper-right buttons inside the preview switch configurations. A lower-right
 robot inset follows the joint sliders, reset, and orbit direction using the same
-renderer. R1 Pro uses the inverse of the takeover leader mapping; Franka shows
-corresponding motion relative to the two home presets, bounded by the Panda joint
-limits. This is illustrative motion, not calibrated robot commands. Robot models
+renderer. R1 Pro uses the inverse of the takeover leader mapping. Franka's CAD is
+rooted at its stationary mounting bracket, so its first joint rotates the arm.
+`franka-joint-map.js` maps the CAD assembly offsets and axis directions to Panda
+joint coordinates; controls use the intersection of both models' joint limits.
+The display home has an upright upper arm and horizontal forearm in both models.
+These are model coordinates, not calibrated motor commands. Robot models
 load only with their corresponding device; an unavailable inset leaves the device
 controls usable. The Panda asset is converted from PyBullet's Apache-2.0 model;
 its source, modifications, and license are in `static/models/franka-NOTICE.txt`
 and `static/models/franka-LICENSE.txt`. Rebuild it with
 `python scripts/export_franka.py /path/to/pybullet_data/franka_panda --compress`
 (requires NumPy, trimesh, and Node >= 18 for gltfpack).
-Drag to orbit, right-drag to pan, and scroll or pinch to zoom. Camera buttons and
+Drag to orbit, right-drag to pan, and scroll or pinch to zoom. Camera buttons inside
+the lower-left corner of the viewer and
 keyboard controls provide alternatives: focus the canvas and use arrow keys to
 orbit, +/− to zoom, and 0/Home to fit. The seven labeled sliders move joints within
 the source URDF limits. Reset pose restores both arms' illustrated starting poses and

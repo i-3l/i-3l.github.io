@@ -38,11 +38,9 @@ export async function createLeaderInset(host, loader, modelUrl) {
     }
     return { ...spec, joints };
   });
-  // Keep a constant scale while allowing front, side, rear, and overhead views.
-  // This frame encloses the recorded arm poses from every viewing direction.
-  const halfHeight = 0.45;
-  const camera = new THREE.OrthographicCamera(-0.43, 0.43, halfHeight, -halfHeight, 0.01, 5);
-  const center = new THREE.Vector3(0, -0.10, -0.10);
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 5);
+  const bounds = new THREE.Box3();
+  const right = new THREE.Vector3(), up = new THREE.Vector3(), corner = new THREE.Vector3();
   const target = new THREE.Vector3();
   const rotation = new THREE.Quaternion();
   let viewport = null;
@@ -60,17 +58,33 @@ export async function createLeaderInset(host, loader, modelUrl) {
       if (!bounds.width || !bounds.height) return;
       viewport = { x: bounds.left - parent.left, y: parent.bottom - bounds.bottom,
         width: bounds.width, height: bounds.height };
-      camera.left = -halfHeight * bounds.width / bounds.height;
-      camera.right = -camera.left;
-      camera.updateProjectionMatrix();
     },
     render(renderer, robotCamera, bodyOrientation) {
       if (!viewport || !viewport.width || !viewport.height) return;
       // Follow the robot's upper body as well as the shared orbit view. Only
       // orientation is shared; the inset keeps its own centered framing/scale.
       leaders.quaternion.copy(bodyOrientation).multiply(CAD_TO_ROBOT);
-      target.copy(center).applyQuaternion(leaders.quaternion);
       robotCamera.getWorldQuaternion(camera.quaternion);
+      bounds.setFromObject(leaders).getCenter(target);
+      right.set(1, 0, 0).applyQuaternion(camera.quaternion);
+      up.set(0, 1, 0).applyQuaternion(camera.quaternion);
+      // Fill the inset with the actual pose rather than a large all-poses box.
+      // Fit projected part bounds so orbiting and fully extended arms stay visible.
+      let halfHeight = 0.08;
+      leaders.traverse(part => {
+        if (!part.geometry) return;
+        if (!part.geometry.boundingBox) part.geometry.computeBoundingBox();
+        const box = part.geometry.boundingBox;
+        for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) {
+          corner.set(x, y, z).applyMatrix4(part.matrixWorld).sub(target);
+          halfHeight = Math.max(halfHeight, Math.abs(corner.dot(up)), Math.abs(corner.dot(right)) * viewport.height / viewport.width);
+        }
+      });
+      camera.top = halfHeight * 1.08;
+      camera.bottom = -camera.top;
+      camera.right = camera.top * viewport.width / viewport.height;
+      camera.left = -camera.right;
+      camera.updateProjectionMatrix();
       camera.position.set(0, 0, 1.5).applyQuaternion(camera.quaternion).add(target);
       const { x, y, width, height } = viewport;
       // Share the R1 renderer and frame clock; no second WebGL context or loop.

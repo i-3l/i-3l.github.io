@@ -257,6 +257,11 @@ class HardwareViewerTests(unittest.TestCase):
                 self.assertLess(tabs['y'] - stage['y'], 15)
                 self.assertLess(abs(stage['x'] + stage['width'] - box['x'] - box['width']), 12)
                 self.assertLess(abs(stage['y'] + stage['height'] - box['y'] - box['height']), 12)
+                toolbar = self.page.locator('.hardware-camera-controls').bounding_box()
+                self.assertGreaterEqual(toolbar['x'], stage['x'])
+                self.assertGreaterEqual(toolbar['y'], stage['y'])
+                self.assertLessEqual(toolbar['x'] + toolbar['width'], box['x'])
+                self.assertLessEqual(toolbar['y'] + toolbar['height'], stage['y'] + stage['height'])
                 self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
 
     def test_robot_preview_failure_keeps_controls_usable_and_retries(self):
@@ -273,6 +278,44 @@ class HardwareViewerTests(unittest.TestCase):
         self.page.get_by_role('button', name='R1 Pro bimanual', exact=True).click()
         expect(inset).to_have_attribute('data-model', 'r1pro')
         expect(inset).to_have_attribute('data-state', 'ready', timeout=30000)
+
+    def test_franka_axes_match_and_mount_stays_fixed(self):
+        for module, name in [('hardware-scene.js', 'device'), ('hardware-robot.js', 'robot')]:
+            source = (ROOT / 'static/js' / module).read_text().replace(
+                'renderer.render(scene, camera);',
+                f'window.__{name}View = {{ scene, camera }}; renderer.render(scene, camera);')
+            self.page.route(f'**/{module}*', functools.partial(
+                lambda source, route: route.fulfill(body=source, content_type='text/javascript'), source))
+        self.load()
+        self.page.get_by_role('button', name='Franka leader', exact=True).click()
+        expect(self.page.locator('.hardware-robot')).to_have_attribute('data-model', 'franka')
+        expect(self.page.locator('.hardware-robot')).to_have_attribute('data-state', 'ready', timeout=30000)
+        check = '''async () => {
+            const THREE = await import('/static/js/vendor/three/three.module.min.js');
+            const cad = window.__deviceView.scene, robot = window.__robotView.scene;
+            cad.updateMatrixWorld(true); robot.updateMatrixWorld(true);
+            const axes = [];
+            for (let i = 0; i < 7; i++) {
+                const a = cad.getObjectByName(`joint_${i}`), b = robot.getObjectByName(`panda_joint${i + 1}`);
+                const av = new THREE.Vector3(...a.userData.joint.axis).applyQuaternion(a.getWorldQuaternion(new THREE.Quaternion()));
+                const bv = new THREE.Vector3(...b.userData.joint.axis).applyQuaternion(b.getWorldQuaternion(new THREE.Quaternion()));
+                axes.push(av.dot(bv) * (i === 5 ? 1 : -1));
+            }
+            return { axes, bracket: cad.getObjectByName('link_dc12_x430_dummy_assy_asm_2').matrixWorld.toArray(),
+                handle: cad.getObjectByName('link_ljcv2_v1').matrixWorld.toArray() };
+        }'''
+        initial = self.page.evaluate(check)
+        sliders = self.page.locator('#hardware-joint-controls input')
+        for i in range(7):
+            for endpoint in ['min', 'max']:
+                sliders.nth(i).evaluate('(n, endpoint) => { n.value = n[endpoint]; n.dispatchEvent(new Event("input")); }', endpoint)
+                state = self.page.evaluate(check)
+                self.assertGreater(min(state['axes']), 0.999999)
+                self.assertEqual(initial['bracket'], state['bracket'])
+                if i == 0:
+                    self.assertNotEqual(initial['handle'], state['handle'])
+            self.page.get_by_role('button', name='Reset pose', exact=True).click()
+        self.assertEqual(initial, self.page.evaluate(check))
 
     def test_delayed_robot_load_does_not_replace_selected_configuration(self):
         held = []

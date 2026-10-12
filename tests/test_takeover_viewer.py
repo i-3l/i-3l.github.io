@@ -137,7 +137,7 @@ class TakeoverViewerTests(unittest.TestCase):
         self.page.wait_for_function('document.querySelector(".takeover-video").readyState >= 2')
         self.seek(400)
         expect(leader.locator('.takeover-leader-status')).to_have_text('Takeover')
-        for width in (720, 1440):
+        for width in (320, 390, 600, 720, 1440):
             self.page.set_viewport_size({'width': width, 'height': 1000})
             self.page.wait_for_timeout(100)
             panel_box = self.page.locator('.takeover-robot').bounding_box()
@@ -198,6 +198,7 @@ class TakeoverViewerTests(unittest.TestCase):
             self.assertGreater(state['forward'], 0.999999)
             self.assertGreater(state['left'], 0.999999)
             self.assertLess(state['extent'], 1)
+            self.assertGreater(state['extent'], 0.8, 'JoyLo+ should fill its inset')
             return state
 
         self.seek(100)
@@ -233,14 +234,23 @@ class TakeoverViewerTests(unittest.TestCase):
         self.seek(900)
         expect(self.page.locator('.takeover-badge-text')).to_have_text('Human takeover')
 
-    def test_models_stay_lazy_and_hidden_on_small_screens(self):
+    def test_models_stay_lazy_and_load_on_small_screens(self):
         self.page.set_viewport_size({'width': 1440, 'height': 650})
         self.page.goto(self.url + '?analytics=off', wait_until='networkidle')
         self.assertFalse(any('takeover-robot.js' in url or 'takeover-joylo.js' in url for url in self.requests))
         self.page.set_viewport_size({'width': 390, 'height': 844})
         self.page.reload(wait_until='networkidle')
         self.page.locator('#takeovers-title').scroll_into_view_if_needed()
-        self.page.wait_for_timeout(250)
-        expect(self.page.locator('.takeover-robot')).to_be_hidden()
-        self.assertFalse(any('takeover-joylo.js' in url for url in self.requests))
+        expect(self.page.locator('.takeover-robot')).to_be_visible()
+        expect(self.page.locator('.takeover-robot')).to_have_attribute('data-state', 'ready', timeout=30000)
+        expect(self.page.locator('.takeover-leader')).to_have_attribute('data-state', 'ready', timeout=30000)
+        self.assertTrue(any('takeover-joylo.js' in url for url in self.requests))
+        self.page.locator('.takeover-robot').scroll_into_view_if_needed()
+        self.page.wait_for_function('document.querySelector(".takeover-video").readyState >= 2')
+        if not self.page.locator('.takeover-video').evaluate('(video) => video.paused'):
+            self.page.locator('.takeover-play').click()
+        self.seek(400)
+        before = self.page.locator('.takeover-leader-viewport').screenshot()
+        self.seek(900)
+        self.assertNotEqual(before, self.page.locator('.takeover-leader-viewport').screenshot())
         self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
