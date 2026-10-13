@@ -1,0 +1,60 @@
+/* Display the published task panels individually on touch/narrow screens.
+ * Crop coordinates refer to the original assets; plots and photos stay unchanged. */
+.task-mobile-panels { display: none; }
+
+@media screen and (max-width: 600px), screen and (hover: none) and (pointer: coarse) {
+  .task-figure > .method-image,
+  .task-figure > .interactive-figure { display: none; }
+
+  .task-mobile-panels {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .task-mobile-item { margin: 0; min-width: 0; }
+  .task-mobile-item figcaption {
+    margin: 0 0 .5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #363636;
+  }
+
+  .task-panel-crop {
+    width: 100%;
+    aspect-ratio: var(--crop-width) / var(--crop-height);
+    background-image: var(--panel-image);
+    background-repeat: no-repeat;
+    background-size: calc(var(--source-width) / var(--crop-width) * 100%) calc(var(--source-height) / var(--crop-height) * 100%);
+    background-position: calc(var(--crop-x) / (var(--source-width) - var(--crop-width)) * 100%) calc(var(--crop-y) / (var(--source-height) - var(--crop-height)) * 100%);
+  }
+
+  .task-figure--overview {
+    --panel-image: url("../images/tasks.jpeg");
+    --source-width: 2263;
+    --source-height: 660;
+  }
+  .task-figure--corrections {
+    --panel-image: url("../images/correction.png");
+    --source-width: 1949;
+    --source-height: 1626;
+  }
+
+  .task-panel-key {
+    font-size: .8rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+  .task-round-legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 24rem;
+    gap: .4rem 1rem;
+    list-style: none;
+    margin: .5rem 0;
+    padding: 0;
+  }
+  .task-round-legend li { display: flex; align-items: center; gap: .35rem; }
+  .task-round-legend svg { width: 2rem; height: .5rem; stroke-width: 3; }
+}
