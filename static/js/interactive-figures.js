@@ -454,6 +454,17 @@
     }
   });
 
+  // Mobile panels share the same canonical task names and selection as desktop figures.
+  // A native button supports taps and keyboard input without capturing scroll gestures.
+  document.querySelectorAll(".task-mobile-item[data-task]").forEach(item => {
+    const name = item.dataset.task;
+    const control = button("", () => selectTask(name), "task-panel-select");
+    control.setAttribute("aria-label", `Follow ${name}`);
+    control.setAttribute("aria-pressed", "false");
+    onTaskChange(selected => control.setAttribute("aria-pressed", String(selected === name)));
+    item.append(control);
+  });
+
   document.querySelectorAll(".rollout-tile").forEach(tile => {
     const name = tile.querySelector(".rollout-task")?.textContent.trim();
     if (name) tagTask(tile, name);

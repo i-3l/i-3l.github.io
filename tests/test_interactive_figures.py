@@ -188,9 +188,9 @@ class InteractiveFiguresTests(unittest.TestCase):
         expect(follow).to_be_visible()
         expect(follow).to_contain_text(name)
         selected = self.page.locator(f'.is-task-selected[data-task="{name}"]')
-        # Both task figures, rollout tile, success column and its label, published table row, body-part row.
-        expect(selected).to_have_count(7)
-        self.assertEqual(self.page.locator(".is-task-selected").count(), 7)
+        # Desktop and mobile figures, rollout tile, success column and label, table row, body-part row.
+        expect(selected).to_have_count(9)
+        self.assertEqual(self.page.locator(".is-task-selected").count(), 9)
         trends = self.page.get_by_role("group", name="Intervention burden across correction rounds", exact=True)
         expect(trends.locator(".viz-task-line.is-focus")).to_have_count(4)
         expect(trends.get_by_role("button", name=re.compile(f"^Highlight {name}"))).to_have_attribute("aria-pressed", "true")
@@ -210,6 +210,80 @@ class InteractiveFiguresTests(unittest.TestCase):
         tasks_figure.get_by_role("button", name="Mug Hanging", exact=True).click()
         self.page.keyboard.press("Escape")
         expect(follow).to_be_hidden()
+
+    def test_mobile_task_panels_follow_and_scroll(self):
+        self.context.close()
+        self.context = self.browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
+        self.context.route("**/*", lambda route: route.continue_() if route.request.url.startswith(self.url) else route.abort())
+        self.page = self.context.new_page()
+        self.page.on("pageerror", lambda error: self.errors.append(str(error)))
+        self.page.goto(self.url, wait_until="networkidle")
+        overview = self.page.locator(".task-figure--overview .task-mobile-panels")
+        corrections = self.page.locator(".task-figure--corrections .task-mobile-panels")
+        follow = self.page.locator(".task-follow")
+        trends = self.page.get_by_role("group", name="Intervention burden across correction rounds", exact=True)
+        expect(overview.locator(".task-panel-select")).to_have_count(8)
+        expect(corrections.locator(".task-panel-select")).to_have_count(8)
+        for item in overview.locator(".task-mobile-item").all():
+            name = item.get_attribute("data-task")
+            item.get_by_role("button", name=f"Follow {name}", exact=True).tap()
+            expect(follow).to_be_visible()
+            expect(follow).to_contain_text(name)
+            for panels in [overview, corrections]:
+                matching = panels.locator(f'.task-mobile-item[data-task="{name}"]')
+                expect(matching).to_have_class(re.compile("is-task-selected"))
+                expect(matching.get_by_role("button")).to_have_attribute("aria-pressed", "true")
+            expect(self.page.locator(f'.task-region[data-task="{name}"][aria-pressed="true"]')).to_have_count(2)
+            expect(trends.locator(".viz-task-line.is-focus")).to_have_count(4)
+            expect(trends.get_by_role("button", name=re.compile(f"^Highlight {re.escape(name)}"))).to_have_attribute("aria-pressed", "true")
+            expect(self.tip()).to_be_hidden()
+            corrections.get_by_role("button", name=f"Follow {name}", exact=True).tap()
+            expect(follow).to_be_hidden()
+            expect(self.page.locator(".task-mobile-item.is-task-selected")).to_have_count(0)
+            expect(self.page.locator('.task-panel-select[aria-pressed="true"]')).to_have_count(0)
+
+        # Canonical names also work with keyboard input, Clear, and Escape.
+        control = overview.get_by_role("button", name="Follow Mug Hanging", exact=True)
+        control.focus()
+        control.press("Enter")
+        expect(corrections.get_by_role("button", name="Follow Mug Hanging", exact=True)).to_have_attribute("aria-pressed", "true")
+        follow.get_by_role("button", name="Clear", exact=True).tap()
+        expect(control).to_have_attribute("aria-pressed", "false")
+        control.focus()
+        control.press("Space")
+        expect(follow).to_be_visible()
+        self.page.keyboard.press("Escape")
+        expect(follow).to_be_hidden()
+
+        # Scrolling over an image must not follow a task or open a tooltip.
+        first = overview.locator(".task-mobile-item").first
+        first.evaluate("e => window.scrollTo(0, scrollY + e.getBoundingClientRect().top - 120)")
+        before = self.page.evaluate("scrollY")
+        box = first.bounding_box()
+        x, y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+        touch = self.context.new_cdp_session(self.page)
+        touch.send("Input.dispatchTouchEvent", {"type": "touchStart", "touchPoints": [{"x": x, "y": y}]})
+        for step in range(1, 7):
+            touch.send("Input.dispatchTouchEvent", {"type": "touchMove", "touchPoints": [{"x": x, "y": y - step * 20}]})
+        touch.send("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
+        self.page.wait_for_function("previous => scrollY > previous + 40", arg=before)
+        expect(follow).to_be_hidden()
+        expect(self.tip()).to_be_hidden()
+
+        # The entire key follows the eight panels, including in touch landscape.
+        for width in [320, 390, 600, 844]:
+            self.page.set_viewport_size({"width": width, "height": 844})
+            # Read both boxes together so touch-scroll inertia cannot skew their relative positions.
+            gap = corrections.evaluate("""panels => {
+                const key = panels.querySelector('.task-panel-key').getBoundingClientRect();
+                const last = [...panels.querySelectorAll('.task-mobile-item')].at(-1).getBoundingClientRect();
+                return key.top - last.bottom;
+            }""")
+            self.assertGreater(gap, 0)
+            expect(corrections.locator(":scope > :last-child")).to_have_class("task-panel-key")
+            for panels in [overview, corrections]:
+                self.assertTrue(panels.evaluate("e => e.scrollWidth <= e.clientWidth"))
+                self.assertLessEqual(panels.evaluate("e => e.getBoundingClientRect().right"), width)
 
     def test_rollout_rate_appears_on_hover(self):
         frame = self.page.locator(".rollout-frame").first
