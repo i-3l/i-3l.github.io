@@ -1,6 +1,7 @@
 :root {
   --i3l-orange: #C45B28;
   --i3l-orange-dark: #A64A1E;
+  --stanford-cardinal: #8C1515;
   --text-muted: #4a4a4a;
 }
 
@@ -32,7 +33,7 @@ body {
 
 h1.title.publication-title {
   font-family: 'Google Sans', sans-serif;
-  color: var(--i3l-orange);
+  color: var(--stanford-cardinal);
   font-size: 2.6rem;
   line-height: 1.2;
 }
