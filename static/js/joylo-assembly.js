@@ -14,6 +14,14 @@ export function assembleLeaders(source, key) {
     right.position.x = leaderOffset;
     right.scale.x = -1;
     right.userData.arm = 'right';
+    // The GLB colors the left leader's Joy-Con purple; the right one is yellow.
+    let yellow;
+    right.traverse(node => {
+      if (!node.isMesh || !/^switch_control_r_updated__(15|18)$/.test(node.name)) return;
+      yellow ??= Object.assign(node.material.clone(), { name: 'joycon_right' });
+      yellow.color.set(0xf2b01e);
+      node.material = yellow;
+    });
     assembly.add(source, right);
     // Fit the bar into both L-shaped brackets: their inner side flanges are
     // 0.0305 m beyond each leader origin, and their rear plates lie at Z=0.04025 m.

@@ -13,7 +13,7 @@
     status.textContent = 'Loading the interactive device…';
     button.hidden = true;
     try {
-      const { createHardwareViewer } = await import('./hardware-scene.js?v=20261011-franka-motion');
+      const { createHardwareViewer } = await import('./hardware-scene.js?v=20261027-joylo-grip');
       await createHardwareViewer(root);
     } catch (error) {
       window.I3LAnalytics?.track('viewer_error', { target: 'startup', section: 'hardware' });

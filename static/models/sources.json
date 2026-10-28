@@ -49,8 +49,8 @@
       "meshes/switch_control_r_updated__18.stl": "9e0b866c743d7bfc0b36129d7e0c98af4946a7aa9a76a700a4223e4d50197fb7",
       "meshes/switch_control_r_updated__19.stl": "5a5956015af5763cde568df15e0791f69993df9923eed7246f4e8c53684b06ae"
     },
-    "output_sha256": "76afcb5cc20f13a656eaddbd9dff9dca91623a12d839de69a69072097004f4c1",
-    "bytes": 4579020
+    "output_sha256": "fb7d6a254b97bb2b367b6cc92125ed7a72a8ea52692b0f68e3c7476d0038a76b",
+    "bytes": 4578256
   },
   "franka": {
     "source": "assets/gello_franka_urdf/robot.urdf",

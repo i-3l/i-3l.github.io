@@ -222,10 +222,10 @@
     if (robotHost.dataset.state !== 'idle') return;
     robotHost.dataset.state = 'loading';
     try {
-      const { createRobotView } = await import('./takeover-robot.js?v=5');
+      const { createRobotView } = await import('./takeover-robot.js?v=6');
       const view = await createRobotView(robotHost, {
         modelUrl: './static/models/r1pro.glb',
-        leaderUrl: './static/models/joylo-r1pro.glb',
+        leaderUrl: './static/models/joylo-r1pro.glb?v=20261027-joylo-grip',
         policyColor: styles.getPropertyValue('--policy').trim() || '#5b7db1',
         takeoverColor: styles.getPropertyValue('--takeover').trim() || '#C45B28',
       });

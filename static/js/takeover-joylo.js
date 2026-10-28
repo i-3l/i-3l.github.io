@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three/three.module.min.js';
-import { assembleLeaders } from './joylo-assembly.js';
+import { assembleLeaders } from './joylo-assembly.js?v=20261027-joylo-grip';
 
 // Robot-space angles -> left-source CAD angles. The controller's encoder signs
 // are [1,-1,-1,1,-1,-1,1] on the left and [-1,-1,-1,-1,-1,-1,1] on the right.

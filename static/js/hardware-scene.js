@@ -2,7 +2,7 @@ import * as THREE from './vendor/three/three.module.min.js';
 import { OrbitControls } from './vendor/three/OrbitControls.js';
 import { GLTFLoader } from './vendor/three/GLTFLoader.js';
 import { MeshoptDecoder } from './vendor/meshopt/meshopt_decoder.module.js';
-import { assembleLeaders } from './joylo-assembly.js?v=20261011-franka-motion';
+import { assembleLeaders } from './joylo-assembly.js?v=20261027-joylo-grip';
 import { createHardwareRobot } from './hardware-robot.js?v=20261011-franka-motion';
 import { frankaCadLimits } from './franka-joint-map.js';
 
@@ -281,7 +281,7 @@ export async function createHardwareViewer(root) {
     placeholder.hidden = false;
     status.textContent = `Loading ${models[key].label}…`;
     try {
-      const url = new URL(`../models/joylo-${key}.glb`, import.meta.url);
+      const url = new URL(`../models/joylo-${key}.glb?v=20261027-joylo-grip`, import.meta.url);
       const result = await loader.loadAsync(url.href, progress => {
         if (progress.total) status.textContent = `Loading ${models[key].label}… ${Math.round(progress.loaded / progress.total * 100)}%`;
       });

@@ -4,15 +4,43 @@
 Uses only Python's standard library. Colors, joint origins, axes, and limits
 are preserved. Positions use 16-bit quantization within each mesh's bounds,
 and normals use signed 8-bit quantization. Triangles are not simplified.
-Collision and inertial data are not exported.
+Collision and inertial data are not exported. APPEARANCE can override a model's
+URDF colors and mirror a link's visuals to match the built device; kinematics
+are untouched.
 """
 import argparse
 import hashlib
 import json
 import math
 from pathlib import Path
+import re
 import struct
 import xml.etree.ElementTree as ET
+
+
+# Display fixes for the R1 Pro leader (the left one; the viewer mirrors it for the right).
+# Colors as built: white printed links, dark servos/fasteners/electronics, a purple
+# Joy-Con shell with black controls (first matching pattern on the mesh name wins).
+# The URDF's grip is the mirror image of the built one: on the real leader the white
+# bracket sits on the inner side of the wrist servo with the Joy-Con's rail in it and
+# the Joy-Con pointing outward. Link 8's y axis is the device's left-right axis at the
+# home pose, so mirroring its visuals across y = 0 (the servo's plane) fixes it.
+APPEARANCE = {
+    'r1pro': {
+        'colors': [(r'^switch_control_r_updated__(15|18)$', '#9D5BD2', 0.45),
+                   (r'^switch_control', '#141414', 0.4),
+                   (r'dc1[25]|dummy|horn|case|cvr|spacer|wbh|bts|phs|b3b|k2043|lcd|display', '#1D1F22', 0.5),
+                   (r'', '#F2F1EC', 0.62)],
+        'mirror': {'8': [1, -1, 1]},
+    },
+}
+
+
+def linear(color):
+    """sRGB hex -> the linear RGBA glTF expects in baseColorFactor."""
+    channels = [int(color[i:i+2], 16) / 255 for i in (1, 3, 5)]
+    return tuple(round(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4, 6)
+                 for c in channels) + (1.0,)
 
 
 def numbers(value):
@@ -35,7 +63,8 @@ def origin(element):
             'rotation': rotation(numbers(attrs.get('rpy', '0 0 0')))}
 
 
-def export(source, target):
+def export(source, target, appearance=None):
+    appearance = appearance or {}
     root = ET.parse(source).getroot()
     binary = bytearray()
     gltf = {'asset': {'version': '2.0', 'generator': 'I3L scripts/export_hardware.py'},
@@ -108,6 +137,7 @@ def export(source, target):
     for link in root.findall('link'):
         children = []
         links[link.attrib['name']] = node({'name': 'link_' + link.attrib['name'], 'children': children})
+        visuals = []
         for visual in link.findall('visual'):
             mesh = visual.find('geometry/mesh')
             if mesh is None:
@@ -115,11 +145,16 @@ def export(source, target):
             filename = mesh.attrib['filename']
             color = visual.find('material/color')
             rgba = tuple(numbers(color.attrib['rgba'])) if color is not None else (0.7, 0.7, 0.7, 1)
-            if rgba not in material_cache:
-                material_cache[rgba] = len(gltf['materials'])
+            roughness = 0.6
+            for pattern, hex_color, rough in appearance.get('colors', []):
+                if re.search(pattern, Path(filename).stem):
+                    rgba, roughness = linear(hex_color), rough
+                    break
+            if (rgba, roughness) not in material_cache:
+                material_cache[rgba, roughness] = len(gltf['materials'])
                 gltf['materials'].append({'pbrMetallicRoughness': {'baseColorFactor': rgba,
-                                          'metallicFactor': 0.12, 'roughnessFactor': 0.6}})
-            material = material_cache[rgba]
+                                          'metallicFactor': 0.12, 'roughnessFactor': roughness}})
+            material = material_cache[rgba, roughness]
             geo = geometry(filename)
             key = (filename, material)
             if key not in mesh_cache:
@@ -128,8 +163,13 @@ def export(source, target):
                                       'primitives': [dict(geo['primitive'], material=material)]})
             geometry_node = node({'name': Path(filename).stem, 'mesh': mesh_cache[key],
                                   'translation': geo['translation'], 'scale': geo['scale']})
-            children.append(node({'name': Path(filename).stem + '_origin', 'children': [geometry_node],
-                                  'scale': numbers(mesh.attrib.get('scale', '1 1 1')), **origin(visual)}))
+            visuals.append(node({'name': Path(filename).stem + '_origin', 'children': [geometry_node],
+                                 'scale': numbers(mesh.attrib.get('scale', '1 1 1')), **origin(visual)}))
+        mirror = appearance.get('mirror', {}).get(link.attrib['name'])
+        if mirror:
+            children.append(node({'name': f"link_{link.attrib['name']}_mirror", 'scale': mirror, 'children': visuals}))
+        else:
+            children.extend(visuals)
 
     child_links = set()
     for joint in root.findall('joint'):
@@ -162,14 +202,18 @@ def export(source, target):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('assets', type=Path, help='Path to the I3L repository assets directory')
+    parser.add_argument('--only', choices=['r1pro', 'franka'], help='Export one model and keep the other')
     args = parser.parse_args()
     output = Path(__file__).resolve().parents[1] / 'static/models'
     output.mkdir(parents=True, exist_ok=True)
-    manifest = {}
+    # Update entries in place; the manifest also lists the robot models.
+    manifest_path = output / 'sources.json'
+    manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
     for name, path in [('r1pro', 'gello_r1pro_urdf/robot_7dof.urdf'),
                        ('franka', 'gello_franka_urdf/robot.urdf')]:
-        manifest[name] = export(args.assets / path, output / f'joylo-{name}.glb')
-    (output / 'sources.json').write_text(json.dumps(manifest, indent=2) + '\n')
+        if args.only in (None, name):
+            manifest[name] = export(args.assets / path, output / f'joylo-{name}.glb', APPEARANCE.get(name))
+    manifest_path.write_text(json.dumps(manifest, indent=2) + '\n')
 
 
 if __name__ == '__main__':
