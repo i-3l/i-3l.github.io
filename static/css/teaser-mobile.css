@@ -1,62 +1,18 @@
-/* Static panels let touch users scroll without triggering image tooltips.
- * Keep the original 2748 × 1021 image and hotspots for desktop and print. */
-.teaser-mobile-panels { display: none; }
+.teaser-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  margin-bottom: 0.9rem;
+  background: #111;
+}
 
-@media screen and (max-width: 600px), screen and (hover: none) and (pointer: coarse) {
-  .teaser-overview {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 2rem;
-  }
+@media screen and (max-width: 600px) {
+  .teaser-overview { margin-bottom: 2rem; }
   .teaser-overview .teaser-caption {
-    order: 1;
-    margin: 0.85rem 0 0;
+    margin: 0;
     font-size: 0.9rem;
     line-height: 1.45;
     text-align: left;
-  }
-  .teaser-overview .teaser-image,
-  .teaser-overview .interactive-figure { display: none; }
-
-  .teaser-mobile-panels {
-    display: grid;
-    gap: 1rem;
-  }
-  .teaser-mobile-item { margin: 0; }
-  .teaser-mobile-item figcaption {
-    margin-top: 0.5rem;
-    color: var(--text-muted);
-    font-size: 0.875rem;
-    line-height: 1.5;
-    text-align: left;
-  }
-  .teaser-mobile-panel {
-    position: relative;
-    width: 100%;
-    aspect-ratio: var(--panel-width) / 1021;
-    border-radius: 6px;
-  }
-  .teaser-mobile-panel::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background-image: url("../images/teaser.jpg");
-    background-repeat: no-repeat;
-    background-size: calc(2748 / var(--panel-width) * 100%) 100%;
-    background-position: var(--panel-position) 0;
-  }
-  /* Crop at the existing white gutters: [839, 857) and [1709, 1726). */
-  .teaser-mobile-item:nth-child(1) {
-    --panel-width: 839;
-    --panel-position: 0%;
-  }
-  .teaser-mobile-item:nth-child(2) {
-    --panel-width: 852;
-    --panel-position: calc(857 / 1896 * 100%);
-  }
-  .teaser-mobile-item:nth-child(3) {
-    --panel-width: 1022;
-    --panel-position: 100%;
   }
 }
